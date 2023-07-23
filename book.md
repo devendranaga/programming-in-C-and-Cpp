@@ -26,6 +26,8 @@ sudo apt install gcc g++
 
 ## Basic Hello World program
 
+Below is a basic hello world program in C.
+
 ```c
 #include <stdio.h>
 
@@ -50,6 +52,14 @@ In order to run the program above, we need to create an executable. To create th
 Copy and Paste the above program in a text editor and save it in a file called `hello_world.c`.
 
 The below command is used to compile the program.
+
+All the source code files written in C will have an extension `.c` or `.h`.
+
+The files with `.h` extensionn are called header files. Header files contain the following.
+
+1. Macro definitions.
+2. Function prototypes.
+3. Data structure definitions.
 
 ```bash
 gcc hello_world.c
