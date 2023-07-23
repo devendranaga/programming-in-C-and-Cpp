@@ -51,8 +51,6 @@ In order to run the program above, we need to create an executable. To create th
 
 Copy and Paste the above program in a text editor and save it in a file called `hello_world.c`.
 
-The below command is used to compile the program.
-
 All the source code files written in C will have an extension `.c` or `.h`.
 
 The files with `.h` extensionn are called header files. Header files contain the following.
@@ -60,6 +58,8 @@ The files with `.h` extensionn are called header files. Header files contain the
 1. Macro definitions.
 2. Function prototypes.
 3. Data structure definitions.
+
+The below command is used to compile the C file.
 
 ```bash
 gcc hello_world.c
@@ -79,6 +79,8 @@ Below are some of the data types for 32 bit systems.
 | 4 | `unsigned short int` | 2 byte unsigned integer | 0 to 65535 |
 | 5 | `int` | 4 byte signed integer | -2147483648 to 2147483647 |
 | 6 | `unsigned int` | 4 byte unsigned integer | 0 to 4294967295 |
+| 7 | `float` | 4 byte floating point variable | - |
+| 8 | `double` | 4 / 8 byte double variable | - |
 
 A variable of the above type can be declared as follows.
 
@@ -125,6 +127,35 @@ int main()
 }
 ```
 
+The `%d` used to print integers. The function `printf` recognizes the integer variables given as function arguments when specified as `%d`.
+
+The body portion start with `"` and end with `"` is called as string. More about the strings in the Strings section below.
+
+Below are some of the format specifiers.
+
+| S.No | Format specifier | Meaning |
+|------|------------------|---------|
+| 1 | `%d` | integer |
+| 2 | `%c` | character |
+| 3 | `%s` | string |
+| 4 | `%f` | float or double |
+| 5 | `%u` | unsigned integer |
+| 6 | `%ld` | long integer |
+| 7 | `%lld` | longlong integer |
+| 8 | `%lu` | long unsigned integer |
+| 9 | `%llu` | long long unsigned integer |
+| 10 | `%x` | hexadecimal |
+
+Below are some more functions that use the format specifiers.
+
+1. scanf
+2. fprintf
+3. fscanf
+4. vfprintf
+5. vfscanf
+
+
+
 ### type definition
 
 Any type can be type defined to another type. The keyword `typedef` is used for this purpose.
@@ -135,6 +166,55 @@ typedef int integer_t;
 
 Now, `integer_t` can be used as a new type to declare variables. The `typedef` can be applied for many other data types such as structures and function pointers.
 
+### operators
+
+C has below operators that can be used on the variables of given types.
+
+| S.No | operator | meaning |
+|------|----------|---------|
+| 1 | `+` | addition |
+| 2 | `-` | subtraction |
+| 3 | `*` | multiplication |
+| 4 | `/` | division |
+| 5 | `%` | modulo |
+| 6 | `=` | equals to |
+| 7 | `==` | comparison operator |
+| 8 | `||` | logical OR |
+| 9 | `&&` | logical AND |
+| 10 | `|` | OR |
+| 11 | `&` | AND |
+| 12 | `^` | XOR |
+| 13 | `!` | NOT |
+| 14 | `!!` | Logical NOT |
+
+Below example shows an example of the operators.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int a = 4;
+    int b = 2;
+    int sum;
+    int sub;
+    int mul;
+    int div;
+    int mod;
+    
+    sum = a + b; // add two numbers
+    sub = a - b; // subtract two numbers
+    mul = a * b; // multiply two numbers
+    div = a / b; // divide two numbers
+    mod = a % b; // modulo two numbers
+    
+    printf("sum %d sub %d\n", sum, sub);
+    printf("mul %d div %d modulo %d\n", mul, div, mod);
+    
+    return 0;
+}
+```
+
 ## Control statements
 
 **1. if else statement**
@@ -142,6 +222,8 @@ Now, `integer_t` can be used as a new type to declare variables. The `typedef` c
 The `if` statement provides a method of controlling the execution path of a program based on the data.
 
 The `if` statement holds the condition and is evaluated for true or false. If the condition is true, then the statements in the `if` are executed, Otherwise the statements in `else` are executed.
+
+The `else` statement in general is followed by the `if` statement and never alone. The `else` statement does not contain any condition test like the `if`.
 
 ```c
 #include <stdio.h>
@@ -160,9 +242,68 @@ int main()
 }
 ```
 
+Generally the `else` statement does not have to follow the `if` statement. But it is a good practise to have an `else` statement if needed.
+
 **2. if else-if statement**
 
+The `if else-if` statement also called `if else ladder` that is used to construct a series of `if else if` conditions.
+
+Below is an example of the `if else-if` ladder.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int number = 50;
+    
+    if (number < 50) {
+        printf("number is less than 50\n");
+    } else if (number > 50) {
+        printf("number is greater than 50\n");
+    } else if (number == 50) {
+        printf("number is equal to 50\n");
+    } else {
+        printf("number is [%d] unknown\n", number);
+    }
+    
+    return 0;
+}
+```
+
+In general `if else-if` ladders are not used in many large scale applications unless there are ranges involved. That is why the
+above example shows the use of `if else-if` with the ranges.
+
+For any direct comparision (`==`) the `switch` statement is used.
+
 **3. Switch statement**
+
+The switch statement example is as shown below.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int n = 50;
+    
+    switch (n) {
+        case 10:
+        	printf("number is 10\n");
+        break;
+        case 20:
+        	printf("number is 20\n");
+        break;
+        case 50:
+        	printf("number is 50\n");
+        break;
+        default:
+        	printf("number [%d] is unknown\n", n);
+        break;
+    }
+    return 0;
+}
+```
 
 **4. Trigraph ?: sequence**
 
