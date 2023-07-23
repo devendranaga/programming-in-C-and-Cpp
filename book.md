@@ -33,6 +33,7 @@ Below is a basic hello world program in C.
 
 int main()
 {
+    // prints Hello World on console
     printf("Hello World\n);
 
     return 0;
@@ -44,6 +45,19 @@ int main()
 The `main()` is a function and the program always executes from `main()`.
 The function call `printf`, allows the program to write to a console.
 The header file `stdio.h` contains the prototype of `printf`.
+
+The `//` indicates comment line. Anything that goes after `//` for the entire line is ignored.
+
+There is another type of comment style that start with `/*` and ends with `*/`. This can be used as a multiline comment.
+
+Here's one example,
+
+```c
+/*
+ This is a multi line comment,
+ showing more than one line can be written.
+ */
+```
 
 The statement `return 0` specifies that the function returns 0. In C, a function may or may not return depend on the function signature.
 
@@ -102,6 +116,12 @@ int a;
 a = 4;
 ```
 
+```c
+int a = 0x20;
+```
+
+initializes `a` with a hexadecimal number. Hexadecimals are noted with the `0x`.
+
 The above statement assigns a to 4.
 
 Sometimes in a program we initialize variables and we assign the variables a value sometime later.
@@ -127,6 +147,8 @@ int main()
 }
 ```
 
+The `sizeof` operator can be used on a variable or the data type itself. Such as calling `sizeof(int)` is valid.
+
 The `%d` used to print integers. The function `printf` recognizes the integer variables given as function arguments when specified as `%d`.
 
 The body portion start with `"` and end with `"` is called as string. More about the strings in the Strings section below.
@@ -146,13 +168,15 @@ Below are some of the format specifiers.
 | 9 | `%llu` | long long unsigned integer |
 | 10 | `%x` | hexadecimal |
 
-Below are some more functions that use the format specifiers.
+Below are some more functions that use the format specifiers. Functions are described in detail below.
 
-1. scanf
-2. fprintf
-3. fscanf
-4. vfprintf
-5. vfscanf
+| S.No | Function Name | 
+|------|---------------|
+| 1 | `scanf` |
+| 2 | `fprintf` |
+| 3 | `fscanf` |
+| 4 | `vfprintf` |
+| 5 | `vfscanf` |
 
 
 
@@ -213,6 +237,45 @@ int main()
     
     return 0;
 }
+```
+
+The `!!` statement is used to check the value of a number is non zero or zero. Below example shows how to use it.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int a = 4;
+    int b = 0;
+
+    printf("a=%d b=%d\n", !!a, !!b);
+
+    return 0;
+}
+```
+
+Below example shows the use of `&` `|` and `^` operators.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int a = 0x80;
+    int b = 0x81;
+
+    printf("AND 0x%02x OR 0x%02x XOR 0x%02x\n",
+                a & b, a | b, a ^ b);
+
+    return 0;
+}
+```
+
+The output is :
+
+```c
+AND 0x80 OR 0x81 XOR 0x01
 ```
 
 ## Control statements
@@ -276,6 +339,28 @@ above example shows the use of `if else-if` with the ranges.
 
 For any direct comparision (`==`) the `switch` statement is used.
 
+For example, the `&&` and `||` can be used within the `if` conditional.
+
+Below is an example,
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int a = 0x80;
+    int b = 0x0;
+
+    if (a && b) {
+        printf("a and b are non zero\n");
+    } else if (a || b) {
+        printf("a or b are non zero\n");
+    }
+
+    return 0;
+}
+```
+
 **3. Switch statement**
 
 The switch statement example is as shown below.
@@ -305,17 +390,240 @@ int main()
 }
 ```
 
+As you can see, the switch has a series of `case` statements and a `default` statement. Each of the `case` statement ends with a `break` statement if necessary. If there is no `break` statement then the statements fall through. Below example shows the descripton.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int n = 10;
+
+    switch (n) {
+        case 10:
+        case 20:
+            printf("n is %d\n", n);
+        break;
+    }
+
+    return 0;
+}
+```
+
+The output is :
+
+```bash
+n is 10
+```
+
+In some cases the fallthroughs are needed to have execute a series of statements for more than one case types.
+
 **4. Trigraph ?: sequence**
+
+The `?:` is called a trigraph sequence. Here's how it can be used.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int a = 10;
+    int b = 5;
+    int res;
+
+    res = (a > b) ? a : b;
+
+    printf("res %d\n", res);
+
+    return 0;
+}
+
+```
+
+Trigraphs are similar to the if else cases the true case is right after the `?` and the false case is right after the `:`.
+
+They are mostly useful when writing simple test on a variable instead of the general `if else` conditionals. 
 
 ## Loops
 
 **1. While loop**
 
+The `while` loop allows to loop over a certain condition until it fails. An example of the `while` is as follows.
+
+```c
+while (condition) {
+    // statements
+}
+```
+
+An example use of `while` loop is as follows.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int i = 0;
+
+    while (i < 10) {
+        printf("i %d\n", i);
+        i ++;
+    }
+
+    return 0;
+}
+```
+
+In the above program the loop repeats until `i` reaches 10. Upon reaching 10, the while condition fails breaking the loop.
+
+The `break` statement can be used in the `while` loop as well.
+
+```c
+int main()
+{
+    int i = 0;
+
+    while (1) {
+        if (i >= 10) {
+            break;
+        }
+        printf("%d\n", i);
+        i ++;
+    }
+
+    return 0;
+}
+```
+
+Above program shows the use of `while (1)`. Generally this means that the condition in the `while` loop is never false. It is an infinite loop.
+
+Generally infinite loops are not preferable in programming without any conditional checks in the `while` statement.
+
+The infinite loops generally do nothing but increase in CPU load on the process the program runs and consumes the CPU cycles unnecessarily. However, some programs written for the
+operating systems do need to run infinitely (such as graphics, display, editors etc). To do this, operating systems employ certain event based mechanisms supported by the
+hardware. This ensures that the program executes only based on certain events.
+
 **2. For loop**
+
+The `for` loop is similar to the `while` loop. The syntax is as follows,
+
+```c
+for (initialization; condition; increment / decrement operation)
+```
+
+Below is an example of the use of `for` loop.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int i;
+
+    for (i = 0; i < 10; i ++) {
+        printf("i %d\n", i);
+    }
+
+    return 0;
+}
+```
+
+the `i = 0` statement in `for` executes only once. The `i < 10` statement executes everytime the loop repeats. The `i ++` statement executes everytime the statements in
+the `for` loop executes.
+
+The above `while (1)` can be re-written with `for` as follows.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int i = 0;
+
+    for (;;) {
+        if (i >= 10) {
+            break;
+        }
+        printf("i %d\n", i);
+        i ++;
+    }
+
+    return 0;
+}
+```
 
 **3. Goto statement**
 
-## Strings
+The statement `goto` is similar to a jump instruction in assembly. The above loop can be rewritten with `goto` as follows.
+
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int i = 0;
+
+begin:
+    if (i < 10) {
+        printf("i %d\n", i);
+        i ++;
+        goto begin;
+    }
+
+    return 0;
+}
+```
+
+We do not use `goto` in most of the programs for the following reasons:
+
+1. Readability reduces with many gotos with in a function or within a C file.
+2. Incorrectly written gotos can cause loops in program.
+
+Gotos are not bad when used correctly in a program. For example in usecases when certain conditions fail during a program initialization, the deinitialization sequence
+must do the opposite. In such cases a jump required on the failure case.
+
+Here's a pseudo code example,
+
+```c
+int init_1()
+{
+    ...
+    return 0;
+}
+
+int init_2()
+{
+    ...
+    return 0;
+}
+
+void deinit_1()
+{
+    ...
+}
+
+int init_main()
+{
+    int ret;
+
+    ret = init_1();
+    if (ret != 0) {
+        return -1;
+    }
+
+    ret = init_2();
+    if (ret != 0) {
+        goto deinit;
+    }
+
+deinit:
+    deinit_1();
+    return -1;
+}
+```
+
+More about functions in the `functions` section.
 
 ## Arrays
 
@@ -356,6 +664,38 @@ int main()
     printf("\n");
 }
 ```
+
+The size of an array is calculated the same way.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int a[10];
+
+    printf("size of array %lu\n", sizeof(a));
+
+    return 0;
+}
+```
+
+With the `sizeof`, one can also find out the number of elements in the array as follows.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int a[10];
+
+    printf("number of elements %d\n", sizeof(a) / sizeof(a[0]));
+
+    return 0;
+}
+```
+
+**Initializing array elements**
 
 **2. Two Dimensional Arrays**
 
@@ -435,16 +775,69 @@ The type `auto` does not signify anything in C. This type is very significant ho
 
 ## Appendix
 
+### Header description
+
 The `stdint.h` from libc has further more data types. See `/usr/include/stdint.h`
 The `limits.h` from libc contains all the ranges of the base types. See `/usr/include/limits.h`.
+
+### Compilation of C program
 
 ### Command line arguments (argc, argv)
 
 ### File I/O
 
+File I/O operations are exposed to the user by the libc. The libc indirectly calls the underlying system calls of the Operating system to manipulate the file. The File I/O APIs are declared in the `stdio.h`.
+
 #### Basic operations
 
 **1. Opening and Closing a file**
+
+`FILE` is the structure implemented by the libc that is used in many of the file operations.
+
+```c
+FILE *fp;
+```
+
+denotes a file pointer of type `FILE`.
+
+`fopen` is used to open the file. `fclose` is used to close the file.
+
+the prototype of `fopen` is
+
+```c
+FILE *fopen(const char *filename, const char *mode);
+```
+
+the prototype of `fclose` is
+
+```c
+int fclose(FILE *fp);
+```
+
+Below example shows the use of `fopen` and `fclose` calls.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    const char *filename = "./test.txt";
+    FILE *fp;
+    int ret = -1;
+
+    fp = fopen(filename, "r");
+    if (fp != NULL) {
+        printf("file opened success\n");
+        fclose(fp);
+        ret = 0;
+    } else {
+        printf("file not found\n");
+        ret = -1;
+    }
+
+    return ret;
+}
+```
 
 **2. Reading from a File**
 
@@ -452,8 +845,12 @@ The `limits.h` from libc contains all the ranges of the base types. See `/usr/in
 
 #### Operating with the binary files
 
+**1. Reading and Writing to a binary file**
+
 ### I/O operations
 
+
+**1. Using fscanf, fgets and fprintf**
 
 
 # C++ programming
@@ -461,6 +858,12 @@ The `limits.h` from libc contains all the ranges of the base types. See `/usr/in
 ## New operators in C++
 
 **1. The Reference (`&`) operator.**
+
+## New keywords in C++
+
+#### constexpr
+
+#### auto
 
 ## Classes
 
@@ -483,6 +886,8 @@ Classes in C++ are similar to the structures in C. The Class is enclosure for da
 #### shared_ptr, unique_ptr
 
 ### Threads
+
+C++ implements abstraction of threads based upon the pthreads. The class `std::thread` defines the thread interface.
 
 ### File systems
 
