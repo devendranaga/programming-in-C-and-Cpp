@@ -98,6 +98,23 @@ A variable that is not initialized is called uninitialized variable. Uninitializ
 
 Each declared variable is associated with a type. Read Recap section about the variables and their scope.
 
+### sizeof operator
+
+The `sizeof` operator is used find out the size of a data type. Below is an example.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int a;
+
+    printf("size a: %d\n", sizeof(a));
+
+    return 0;
+}
+```
+
 ### type definition
 
 Any type can be type defined to another type. The keyword `typedef` is used for this purpose.
@@ -195,15 +212,23 @@ int main()
 
 ## Strings
 
+The below statement is a base char type.
+
+```c
+char d;
+```
+
+String is an array of characters ending with `\0`. For example, the below statement defines a base string type.
+
+```c
+char d[20];
+```
+
+declares a string of 19 elements with the last element allocated to the `\0`.
+
 ### String manipulation operations
 
-## Structures
-
-### Bit fields
-
-## Enumeration
-
-## Unions
+The header file `string.h` contains the functions that help to manipulate the string data.
 
 ## Dynamic Memory Allocation
 
@@ -245,10 +270,22 @@ The type `auto` does not signify anything in C. This type is very significant ho
 
 ### Function Pointers
 
+## Structures
+
+### Bit fields
+
+### Structure packing
+
+### Structure pointer
+
+## Enumeration
+
+## Unions
 
 ## Appendix
 
-The `stdint.h` from libc has further more data types.
+The `stdint.h` from libc has further more data types. See `/usr/include/stdint.h`
+The `limits.h` from libc contains all the ranges of the base types. See `/usr/include/limits.h`.
 
 ### Command line arguments (argc, argv)
 
@@ -265,6 +302,8 @@ The `stdint.h` from libc has further more data types.
 #### Operating with the binary files
 
 ### I/O operations
+
+
 
 # C++ programming
 
