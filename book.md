@@ -697,9 +697,91 @@ int main()
 
 **Initializing array elements**
 
+The below statement generally initializes the array.
+
+```c
+int a[10] = {0};
+```
+
+However, this initializes the first element to 0. Since only one element is initialized then by default all elements are initialized to 0.
+
+So if we have initialized it,
+
+```c
+int a[10] = {10};
+```
+
+the first element of the array is initialized to 10 and the rest of the elements are initialized as 0s. Below is one example:
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int a[10] = {10};
+    int i;
+
+    for (i = 0; i < sizeof(a) / sizeof(a[0]); i ++) {
+        printf("a[%d] = %d\n", i, a[i]);
+    }
+
+    return 0;
+}
+```
+
 **2. Two Dimensional Arrays**
 
 **3. Three Dimensional Arrays**
+
+## Macros
+
+Macros are compile time constants and do not allocate any space in runtime. This means that the preprocessor replaces the sections where Macros are used, into their corresponding values.
+
+In the above example we used `#include <stdio.h>`, where `#include` is a directive. This informs the compiler to replace this statement with the header file `stdio.h`.
+
+**#define macro**
+
+
+## Functions
+
+Function in a C program is a group of instructions. Functions allow us to break a large program into pieces of understandable segments. Each segment with some defined 
+business logic, logical implementation.
+
+A function has none, one or more input arguments and returns or do not return anything.
+
+For example,
+
+
+```c
+#include <stdio.h>
+
+void print_hello()
+{
+    printf("Hello World\n");
+}
+
+int main()
+{
+    print_hello();
+}
+```
+
+The above example calls a function called `print_hello` to print the "Hello World" on screen.
+
+The call to the function is simply by writing its name followed by the parantheses with none, one or more arguments and followed by a semicolon.
+
+This function does not accept any argument and does not return anything.
+
+The statements,
+
+```c
+void print_hello()
+{
+    printf("Hello World\n");
+}
+```
+
+comprise the body of the function. Its also referred as function definition.
 
 ## Strings
 
@@ -721,6 +803,34 @@ declares a string of 19 elements with the last element allocated to the `\0`.
 
 The header file `string.h` contains the functions that help to manipulate the string data.
 
+#### String manipulation functions
+
+The standard library provides below or more of the functions to manipulate the strings.
+
+**1. strlen**
+
+**2. strcpy**
+
+#### Library Functions to convert a string to other types
+
+**1. atoi**
+
+**2. strtol**
+
+**3. strtod**
+
+**4. strtoul**
+
+## Pointers
+
+Strings can also be initialized with a pointer.
+
+The below statement is a string that is allocated at compile time and the `str` is a pointer to the beginning of the string "Hello".
+
+```c
+char *str = "Hello";
+```
+
 ## Dynamic Memory Allocation
 
 **1. malloc**
@@ -731,19 +841,6 @@ The header file `string.h` contains the functions that help to manipulate the st
 
 **4. free**
 
-## Library Functions
-
-**1. atoi**
-
-**2. strtol**
-
-**3. strtod**
-
-**4. strtoul**
-
-## Functions
-
-## Pointers
 
 ### Recap about variables and scope
 
@@ -774,6 +871,8 @@ The type `auto` does not signify anything in C. This type is very significant ho
 ## Unions
 
 ## Appendix
+
+### Significance of header files
 
 ### Header description
 
