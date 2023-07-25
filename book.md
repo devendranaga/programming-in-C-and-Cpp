@@ -196,20 +196,20 @@ C has below operators that can be used on the variables of given types.
 
 | S.No | operator | meaning |
 |------|----------|---------|
-| 1 | `+` | addition |
-| 2 | `-` | subtraction |
-| 3 | `*` | multiplication |
-| 4 | `/` | division |
-| 5 | `%` | modulo |
-| 6 | `=` | equals to |
-| 7 | `==` | comparison operator |
-| 8 | `||` | logical OR |
-| 9 | `&&` | logical AND |
-| 10 | `|` | OR |
-| 11 | `&` | AND |
-| 12 | `^` | XOR |
-| 13 | `!` | NOT |
-| 14 | `!!` | Logical NOT |
+| 1 | + | addition |
+| 2 | - | subtraction |
+| 3 | * | multiplication |
+| 4 | / | division |
+| 5 | % | modulo |
+| 6 | = | equals to |
+| 7 | == | comparison operator |
+| 8 | || | logical OR |
+| 9 | && | logical AND |
+| 10 | | | OR |
+| 11 | & | AND |
+| 12 | ^ | XOR |
+| 13 | ! | NOT |
+| 14 | !! | Logical NOT |
 
 Below example shows an example of the operators.
 
@@ -277,6 +277,18 @@ The output is :
 ```c
 AND 0x80 OR 0x81 XOR 0x01
 ```
+
+We have declared many variables over the examples. Each variable declared within the function has some certain scope and lifecycle.
+
+In the above function, the variables `a` and `b` are called local variables. This means that the scope of these variables are within the lifetime of the function.
+If the function returns the variables will be destroyed or removed from the memory.
+
+Each program has a determined memory set aside by default by the operating system. This memory is dvidied into the following partitions.
+
+1. stack segment
+2. heap segment
+3. data segment
+4. text segment
 
 ## Control statements
 
@@ -731,7 +743,43 @@ int main()
 
 **2. Two Dimensional Arrays**
 
+Two dimensional arrays are represented as follows.
+
+```c
+int a[10][10];
+```
+
+denotes a two dimensional array.
+
+To access the elements one must iterate both indexes with two loops. Or we call them here the nested loops.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int a[10][10];
+    int i;
+    int j;
+
+    for (i = 0; i < 10; i ++) {
+        for (j = 0; j < 10; j ++) {
+            a[i][j] = j + i;
+        }
+    }
+
+    for (i = 0; i < 10; i ++) {
+        for (j = 0; j < 10; j ++) {
+            printf("a[%d][%d] = %d\n", i, j, a[i][j]);
+        }
+    }
+
+    return 0;
+```
+
 **3. Three Dimensional Arrays**
+
+The usecases of arrays range in many places, such as grouping a set of characters together, or grouping of similar types together to represent a hardware device or group of same hardware devices and so on. Also arrays play a big role in search and sort techniques.
 
 ## Macros
 
@@ -781,7 +829,107 @@ void print_hello()
 }
 ```
 
-comprise the body of the function. Its also referred as function definition.
+comprise the body of the function. Its also referred as function definition. A program typically contains more than one function.
+
+`main()` is also a function which is the starting point of a program.
+
+A function can only have one signature in C (A function can have many signatures in C++). `main()` prototypes are many unlike many other functions. Some of the most used prototypes are as follows.
+
+`int main(void)`
+
+`int main(int argc, char **argv)`
+
+`void main(void)` -> however this is seldom used when writing software. `main()` must return. This is to let the executing shell to know the status of the program when returned. The shell can use this status to further perform certain operations. (example is that shell scripts can use the return status of a program).
+
+The second prototype is further described in command line arguments section.
+
+
+A function can return any data type or none. For example,
+
+```c
+int f(void);
+```
+
+The above function returns integer type but accepts no arguments.
+
+A function can take one or more arguments and return none or one type. For example,
+
+
+```c
+int f(double a, double b);
+```
+
+The above function accepts two variables of type `double` and returns an integer.
+
+A small example shows the usecase.
+
+```c
+#include <stdio.h>
+
+int add(int a, int b)
+{
+    return a + b;
+}
+
+int sub(int a, int b)
+{
+    return a - b;
+}
+
+int mul(int a, int b)
+{
+    return a * b;
+}
+
+int div(int a, int b)
+{
+    return a / b;
+}
+
+int main()
+{
+    int a = 10;
+    int b = 5;
+
+    printf("add %d\n", add(a, b));
+    printf("sub %d\n", sub(a, b));
+    printf("mul %d\n", mul(a, b));
+    printf("div %d\n", div(a, b));
+
+    return 0;
+}
+```
+
+The above program creates and calls 4 functions `add`, `sub`, `mul`, and `div` from `main()`.
+
+Each function does exactly one job and named as per the job it does to help reader of the program understands. This is usually the discipline that is followed when writing software.
+
+Each function returns only integers, but the program does not work correctly (rounding off errors) when given floating point numbers. Writing such generic functions are explained more in C++ templates.
+
+### Function like macros
+
+Since we read about macros above, we can rewrite the above functions as follows.
+
+
+```c
+#define add(_a, _b) ((_a) + (_b))
+#define sub(_a, _b) ((_a) - (_b))
+#define mul(_a, _b) ((_a) * (_b))
+#define div(_a, _b) ((_a) / (_b))
+
+int main()
+{
+    int a = 10;
+    int b = 5;
+
+    printf("add %d\n", add(a, b));
+    printf("sub %d\n", sub(a, b));
+    printf("mul %d\n", mul(a, b));
+    printf("div %d\n", div(a, b));
+
+    return 0;
+}
+```
 
 ## Strings
 
@@ -809,7 +957,57 @@ The standard library provides below or more of the functions to manipulate the s
 
 **1. strlen**
 
+The library function `strlen` is used to get the length of a string. Below is an example,
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    char str[] = "hello world";
+
+    printf("strlen = %d\n", strlen(str));
+
+    return 0;
+}
+
+```
+
+The `strlen` function counts all the characters in the string excluding the `\0` marker.
+
+It can be implemented as follows.
+
+```c
+int string_length(const char *str)
+{
+    int i = 0;
+
+    for (i = 0; str[i] != '\0'; i ++);
+
+    return i;
+}
+```
+
+The above program iterates over each character in the string `str` until the character is `\0`. So the content
+of the for loop does nothing. So we end it with a semicolon. Sometimes open and closed braces (`{` and `}`) can be used as well.
+
+Note that the behavior is that the last character should always be null terminated. If there are characters present beyond the null terminating
+character then they will be ignored.
+
+If there is no null character in the string, then the `strlen` function will keep on reading and may even read past the allocated buffer
+in some cases. This sometimes causes crashes if lucky and sometimes executes other code if not lucky leading to exploits.
+
+So caution must be taken when creating and using the strings. Always null terminate the strings.
+
 **2. strcpy**
+
+**3. strcmp**
+
+**4. strchr**
+
+**5. memcmp**
+
+**6. memcpy**
 
 #### Library Functions to convert a string to other types
 
@@ -977,6 +1175,8 @@ Classes in C++ are similar to the structures in C. The Class is enclosure for da
 ### Multiple inheritance
 
 ### Abstract Classes
+
+## Templates
 
 ## Appendix
 
