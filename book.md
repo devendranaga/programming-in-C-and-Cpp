@@ -146,6 +146,8 @@ int main()
     return 0;
 }
 ```
+<i>Example. 2 sizeof operator</i>
+
 
 The `sizeof` operator can be used on a variable or the data type itself. Such as calling `sizeof(int)` is valid.
 
@@ -210,6 +212,8 @@ C has below operators that can be used on the variables of given types.
 | 12 | ^ | XOR |
 | 13 | ! | NOT |
 | 14 | !! | Logical NOT |
+| 15 | ++ | increment operator |
+| 16 | -- | decrement operator |
 
 Below example shows an example of the operators.
 
@@ -238,6 +242,46 @@ int main()
     return 0;
 }
 ```
+<i>Example.3 Operators example</i>
+
+
+The `++` and `--` are increment and decrement operators. Below example shows how to use them.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int i = 0;
+
+    printf("i %d \n", ++ i);
+
+    return 0;
+}
+```
+
+The above program prints the value 1.
+
+Consider the another program.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int i = 0;
+
+    printf("i %d\n", i ++);
+
+    return 0;
+}
+```
+
+The above program prints the value 0.
+
+This is generally called the undefined behavior. The language leaves the behavior upto the compiler. The `++ i` used, this is caleld prefix notation and the `i ++` is the postfix notation.
+
+More usecases of `++` and `--` in `while` and `for`.
 
 The `!!` statement is used to check the value of a number is non zero or zero. Below example shows how to use it.
 
@@ -280,8 +324,7 @@ AND 0x80 OR 0x81 XOR 0x01
 
 We have declared many variables over the examples. Each variable declared within the function has some certain scope and lifecycle.
 
-In the above function, the variables `a` and `b` are called local variables. This means that the scope of these variables are within the lifetime of the function.
-If the function returns the variables will be destroyed or removed from the memory.
+In the above function, the variables `a` and `b` are called local variables. This means that the scope of these variables are within the lifetime of the function. If the function returns the variables will be destroyed or removed from the memory.
 
 Each program has a determined memory set aside by default by the operating system. This memory is dvidied into the following partitions.
 
@@ -289,6 +332,14 @@ Each program has a determined memory set aside by default by the operating syste
 2. heap segment
 3. data segment
 4. text segment
+
+**1. Stack segment**
+
+In linux stacks are of 8 kbytes in size by default. But it varies on operating system, sometimes application wise. In RTOS based systems, it is configured at the linker script
+
+**3. Heap segment**
+
+This is the space where the dynamic memory can be allocated.
 
 ## Control statements
 
@@ -316,6 +367,8 @@ int main()
     return 0;
 }
 ```
+
+A conditional check `if (p)` is also a valid check , but this check only check if the value is non zero. If the value is 0, then the statements under `if (p)` never executes. Understand that in C, the conditional checks depend on the value in the variable.
 
 Generally the `else` statement does not have to follow the `if` statement. But it is a good practise to have an `else` statement if needed.
 
@@ -348,6 +401,8 @@ int main()
 
 In general `if else-if` ladders are not used in many large scale applications unless there are ranges involved. That is why the
 above example shows the use of `if else-if` with the ranges.
+
+In most of the cases `if else-if` never ends with an `else` case, only few programming situations `else` case might be required.
 
 For any direct comparision (`==`) the `switch` statement is used.
 
@@ -565,7 +620,28 @@ int main()
 
 The `for(;;)` is also an infinite for loop. As mentioned, the infinite loops must be used with caution.
 
-**3. Goto statement**
+**3. do while loop**
+
+The `do..while` loop is similar to the `while`. Below is an example.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int i = 0;
+
+    do {
+        printf("Hello World\n");
+    } while (i != 0);
+
+    return 0;
+}
+```
+
+Once run, it prints `Hello World`. This means that the statements execute and the checks happen later.
+
+**4. Goto statement**
 
 The statement `goto` is similar to a jump instruction in assembly. The above loop can be rewritten with `goto` as follows.
 
@@ -1010,13 +1086,64 @@ So caution must be taken when creating and using the strings. Always null termin
 
 **2. strcpy**
 
-**3. strcmp**
+The `strcopy` function is used to copy the source string into the destination.
 
-**4. strchr**
+Its prototype is as follows.
 
-**5. memcmp**
+```c
+char *strcpy(char *dst, const char *str);
+```
 
-**6. memcpy**
+The example of `strcpy` is as follows.
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+    char *str1 = "Witcher";
+    char str2[20];
+
+    strcpy(str2, str1);
+
+    printf("str1 [%s] str2 [%s]\n", str1, str2);
+
+    return 0;
+}
+```
+
+`strcpy` can be implemented as follows.
+
+```c
+int string_copy(char *dst, unsigned int dst_len, const char *src)
+{
+    uint32_t i = 0;
+    uint32_t len = 0;
+
+    for (i = 0; src[i] != '\0'; i ++) {
+        if (i < dst_len) {
+            dst[i] = src[i];
+        } else {
+            break;
+        }
+    }
+
+    dst[i - 1] = '\0';
+
+    return 0;
+}
+```
+
+**3. strcat**
+
+**4. strcmp**
+
+**5. strchr**
+
+**6. memcmp**
+
+**7. memcpy**
 
 #### Library Functions to convert a string to other types
 
@@ -1080,6 +1207,54 @@ int main()
 
 **4. free**
 
+Every memory allocation must be freed, otherwise the system will run out of the memory. This is called memory leak. Below is one example of the free.
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int *a;
+
+    a = malloc(sizeof(int));
+    if (a) {
+        *a = 4;
+
+        printf("a %p *a %d\n", a, *a);
+        free(a);
+    }
+
+    return 0;
+}
+```
+
+**2. Allocating and freeing array**
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int *a;
+    int i;
+
+    a = malloc(10 * sizeof(int));
+    for (i = 0; i < 10; i ++) {
+        a[i] = i;
+    }
+
+    for (i = 0; i < 10; i ++) {
+        printf("a[%d] = %d\n", i, a[i]);
+    }
+
+    free(a);
+
+    return 0;
+}
+```
+
 
 ### Recap about variables and scope
 
@@ -1094,6 +1269,24 @@ int main()
 The type `auto` does not signify anything in C. This type is very significant however in C++.
 
 **3. volatile type**
+
+The keyword `volatile` is used in places where there is a real address being used. It is attached generally to integers.
+
+```c
+volatile uint32_t *addr = 0xA0000000;
+```
+
+Lets look at an example where a register in the memory needs to be checked continuously until it reaches a certain value.
+
+```c
+while ((*addr & 0x80) == 1) {
+    ...
+}
+```
+
+The addr is not set by the software but by the hardware.
+
+Without the use of the `volatile` keyword, the compiler would simply return without executing anything in the inner loop.
 
 ### Function Pointers
 
@@ -1111,6 +1304,39 @@ struct shelf {
 ```
 
 Above structure defines a shelf that contains a list of books and papers, one is a string and another is an integer.
+
+Defining the structure variable is similar to defining the base type.
+
+```c
+struct shelf s;
+```
+
+here `s` is of type structure `shelf`.
+
+Accessing the elements in the structure is via the `.` operator.
+
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+struct shelf {
+    char book_name[10];
+    int n_papers;
+};
+
+int main()
+{
+    struct shelf s;
+
+    strcpy(s.book_name, "Witcher");
+    s.n_papers = 2000;
+
+    printf("book_name: %s papers: %d\n", s.book_name, s.n_papers);
+
+    return 0;
+}
+```
 
 ### Bit fields
 
@@ -1319,6 +1545,27 @@ class singleton {
 
 ### creating libraries
 
+When writing software for a large scale project, sometimes some of the utility functions or common routines need to be called often. Sometimes, many application tend to replicate these and roll out their own implementation of these functions. This is generally has the following problems:
+
+1. Code bloat with repeat of many functions doing same thing.
+2. If there is a problem in one function, the other callers that are not using this function will not get a benefit when the function's problem is solved.
+3. Increased program size.
+4. Increased development times.
+
+These are some of the reasons why libraries concept is introduced.
+
+The Compiler provides a way to generate libraries out of a group of C or C++ source files. They are group of object files and the functions they offer, contain prototypes in the respective .h files.
+
+These libraries can then be linked with the other object files during the linkage time to create the final binary / library.
+
+There are static and dynamic libraries.
+
+Static libraries are the ones that when linked, copies the function directly to the target binary. This increases the size of the binary considerably.
+
+Dynamic libraries on the other hand, keeps a reference of the function in the target binary. This may not increase the size of the binary. However, during the runtime, the loader sees the reference of the function and loads the function when it gets called. This adds additional runtime over head.
+
+Check `cmake` section about creating static and dynamic libraries.
+
 ### creating binaries
 
 ### cmake
@@ -1343,6 +1590,27 @@ The above cmake file is created to make an executable file called `file_ops`.
 The source files `file_1.c` and `file_2.c` are part of the `SRC` definition.
 
 The call `add_executable` instructs to create the binary `file_ops` with the given files identified by `SRC`.
+
+The items `project` and `cmake_minimum_required` are not mandatory but cmake warns when we do not keep them. They generally help you guide about what project you are building to and the type of cmake features you are using.
+
+Below is the command to generate the target binary, 
+
+```bash
+mkdir build/
+cd build/
+cmake ..
+make
+```
+
+`cmake` build generates a lot of intermediate artifacts and dirties the directory. So, better create a directory called `build` and run `cmake` from there.
+
+If you do not have `cmake` installed, on Ubuntu run the following command:
+
+```bash
+sudo apt install make cmake
+```
+
+**2. Creating library**
 
 
 # Data Structures
