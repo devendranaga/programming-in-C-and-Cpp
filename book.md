@@ -449,7 +449,6 @@ int main()
 
     return 0;
 }
-
 ```
 
 Trigraphs are similar to the if else cases the true case is right after the `?` and the false case is right after the `:`.
@@ -564,6 +563,8 @@ int main()
 }
 ```
 
+The `for(;;)` is also an infinite for loop. As mentioned, the infinite loops must be used with caution.
+
 **3. Goto statement**
 
 The statement `goto` is similar to a jump instruction in assembly. The above loop can be rewritten with `goto` as follows.
@@ -636,6 +637,8 @@ deinit:
 ```
 
 More about functions in the `functions` section.
+
+In areas such as Automotive and Aerospace software application, `goto` statement is seldom used. It is treated as a bad practise. So avoiding this is a good step when writing software for such applications.
 
 ## Arrays
 
@@ -906,6 +909,12 @@ Each function does exactly one job and named as per the job it does to help read
 
 Each function returns only integers, but the program does not work correctly (rounding off errors) when given floating point numbers. Writing such generic functions are explained more in C++ templates.
 
+### Variadic functions
+
+Variadic functions are the ones that can accept infinite arguments as input to them.
+
+The header `stdarg.h` contains the macros and helper functions to make variadic functions possible.
+
 ### Function like macros
 
 Since we read about macros above, we can rewrite the above functions as follows.
@@ -1029,9 +1038,41 @@ The below statement is a string that is allocated at compile time and the `str` 
 char *str = "Hello";
 ```
 
+### Pass by value and Pass by reference in functions
+
+**The void pointer**
+
+
 ## Dynamic Memory Allocation
 
 **1. malloc**
+
+The `malloc` function is a C function that is used to allocate memory dynamically. It is declared in `stdlib.h`
+
+The prototype is as follows:
+
+```c
+void *malloc(int size);
+```
+
+The example code is as follows.
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int *a;
+
+    a = malloc(sizeof(int));
+    *a = 4;
+
+    printf("a %p *a %d\n", a, *a);
+
+    return 0;
+}
+```
 
 **2. calloc**
 
@@ -1058,6 +1099,19 @@ The type `auto` does not signify anything in C. This type is very significant ho
 
 ## Structures
 
+Data structure is a group of variables of different types. The `struct` word is used as an identifier to the compiler to make it recognize the structure.
+
+An example of data structure looks as follows.
+
+```c
+struct shelf {
+    char book_name[10];
+    int n_papers;
+};
+```
+
+Above structure defines a shelf that contains a list of books and papers, one is a string and another is an integer.
+
 ### Bit fields
 
 ### Structure packing
@@ -1068,7 +1122,7 @@ The type `auto` does not signify anything in C. This type is very significant ho
 
 ## Unions
 
-## Appendix
+## Appendix A
 
 ### Significance of header files
 
@@ -1138,6 +1192,29 @@ int main()
 
 **2. Reading from a File**
 
+```c
+#include <stdio.h>
+
+int main()
+{
+    const char *filename = "./test.txt";
+    char msg[1024];
+    FILE *fp;
+    int ret = -1;
+
+    fp = fopen(filename, "r");
+    if (fp) {
+        while (fgets(msg, sizeof(msg), fp)) {
+            printf("%s", msg);
+        }
+        fclose(fp);
+        ret = 0;
+    }
+
+    return ret;
+}
+```
+
 **3. Writing to a file**
 
 #### Operating with the binary files
@@ -1160,11 +1237,19 @@ int main()
 
 #### constexpr
 
+#### explicit
+
 #### auto
 
 ## Classes
 
 Classes in C++ are similar to the structures in C. The Class is enclosure for data and operations on the data.
+
+### Constructors and Destructors
+
+**Copy constructor**
+
+**Move constructor**
 
 ## Polymorphism
 
@@ -1178,7 +1263,7 @@ Classes in C++ are similar to the structures in C. The Class is enclosure for da
 
 ## Templates
 
-## Appendix
+## Appendix B
 
 ### Scoppe and Lifetime
 
@@ -1196,14 +1281,160 @@ C++ implements abstraction of threads based upon the pthreads. The class `std::t
 
 ### Singleton pattern
 
+The singleton pattern is used when an object is being used by many other classes. One way to do is to instantiate it statically and return that instance.
+
+Since its been used by many other classes, the instantiation happens statically within the class itself. For this one generally defines `instance` member function that returns the statically declared class object. The constructor is hidden to prevent any more instantiations by the class declarations.
+
+An example singleton class looks as follows.
+
+```cpp
+class singleton {
+    public:
+        static singleton *instance() {
+            static singleton s;
+            return &s;
+        }
+        ~singleton() = default;
+        singleton(const singleton &) = delete;
+        const singleton &operator=(const singleton &) = delete;
+        singleton(const singleton &&) = delete;
+        const singleton &&operator=(const singleton &&) = delete;
+
+        int member(...);
+
+    private:
+        explicit singleton();
+}
+```
+
+**usecase.1: Logging utility**
+
+**usecase.2: Datastore**
+
+# Appendix C
+
+## Code organization for software development
+
+## Building large software
+
+### creating libraries
+
+### creating binaries
+
+### cmake
+
+cmake is a scripting language that can be used to create what are known as CMake Files. Each of these can be used to compile the group of source files to generate target libraries or binaries.
+
+**1. Creating a basic CMakeLists.txt**
+
+```cmake
+cmake_minimum_required(VERSION 3.9)
+project(Example)
+
+set(SRC
+        ./file_1.c
+        ./file_2.c)
+
+add_executable(file_ops ${SRC})
+```
+
+The above cmake file is created to make an executable file called `file_ops`.
+
+The source files `file_1.c` and `file_2.c` are part of the `SRC` definition.
+
+The call `add_executable` instructs to create the binary `file_ops` with the given files identified by `SRC`.
+
 
 # Data Structures
 
 ## Linked Lists
 
+Linked list is a chain of elements terminated with a `NULL` pointer.
+
+Each item in chain is called the node. Each node contains data and a pointer to the next item in the list. The last node pointer will be `NULL`.
+
+Linked list structure looks as follows:
+
+```
+|--------|    |--------|
+| item 1 |--->| item 2 |---> .... -> NULL
+|--------|    |--------|
+```
+
+The list always ends with a NULL pointer.
+
+The linked list structure looks as follows.
+
+```c
+struct linked_list {
+    void *data;
+    struct linked_list *next;
+}
+```
+
+the `data` pointer holds the data and the `next` pointer links to the next element in the list.
+
+Below are some of the general operations on the linked list.
+
+| S.No | Name | Description |
+|------|------|-------------|
+| 1 | `add` | Add an element to the list at the end |
+| 2 | `add_head` | Add an element to the list at the head |
+| 3 | `delete` | delete an element from the list |
+| 4 | `insert` | insert an element at a particular position in the list |
+| 5 | `find` | find an element in the list |
+| 6 | `count` | count the number of elements in the list |
+| 7 | `for_each` | iterate through each eement in the list |
+
+
 ## Doubly Linked Lists
 
+Doubly linked list is a chain of elements terminated with a `NULL` pointer.
+
+Each item in chain is called the node. Each node contains data and two pointers. One pointer points to the next elements and another points backwards. 
+```
+        |--------|     |--------|
+NULL<---| item 1 |---->| item 2 |--->.... ---> NULL
+        |--------|<----|--------|<---.....
+```
+
+The doubly linked list structure looks as follows.
+
+
+```c
+struct doubly_linked_list {
+    void *data;
+    struct doubly_linked_list *prev;
+    struct doubly_linked_list *next;
+};
+```
+
+
+The `data` pointer holds the data and the `prev` pointer points to the previous node in the list and the `next` pointer points to the `next` element in the list.
+
+| S.No | Name | Description |
+|------|------|-------------|
+| 1 | `add` | Add an element to the list at the end |
+| 2 | `add_head` | Add an element to the list at the head |
+| 3 | `delete` | delete an element from the list |
+| 4 | `insert` | insert an element at a particular position in the list |
+| 5 | `find` | find an element in the list |
+| 6 | `count` | count the number of elements in the list |
+| 7 | `for_each` | iterate through each eement in the list |
+
+
 ## Circular Linked Lists
+
+Circular lists is similar to the linked list and the difference is that the last node points the first node.
+
+```
+    |--------|      |--------|           |--------|
+    | item 1 |----->| item 2 |----> .... | item n |
+    |--------|      |--------|           |--------|
+       ^                                      |
+       |--------------------------------<<----|
+
+```
 
 ## Stack
 
@@ -1212,3 +1443,6 @@ C++ implements abstraction of threads based upon the pthreads. The class `std::t
 ## Ring Buffer
 
 ## Tree
+
+# Search and Sorting
+
