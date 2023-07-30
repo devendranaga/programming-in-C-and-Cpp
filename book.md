@@ -130,6 +130,14 @@ A variable that is not initialized is called uninitialized variable. Uninitializ
 
 Each declared variable is associated with a type. Read Recap section about the variables and their scope.
 
+Declaring doubles:
+
+```c
+double f = 3.14;
+```
+
+Double values are represented after the decimal `.`. Exact double values are not possible to represent in C.
+
 ### sizeof operator
 
 The `sizeof` operator is used find out the size of a data type. Below is an example.
@@ -181,6 +189,20 @@ Below are some more functions that use the format specifiers. Functions are desc
 | 5 | `vfscanf` |
 
 
+### const keyword
+
+The `const` keyword is generally applied on variables that does not change their value over the execution time.
+
+```c
+const int a = 4;
+```
+
+defines a constant int of 4. Sometimes a result of a mathematical calculation can also be a constant.
+
+```c
+const double radius = 3;
+const double circumferance = 2 * 3.14 * 3;
+```
 
 ### type definition
 
@@ -246,6 +268,8 @@ int main()
 
 
 The `++` and `--` are increment and decrement operators. Below example shows how to use them.
+
+The boolean operations such as `|` , `&`, `||`, `&&`, `^` and `!` never apply to the `double` or `float` variables.
 
 ```c
 #include <stdio.h>
@@ -1149,6 +1173,18 @@ int string_copy(char *dst, unsigned int dst_len, const char *src)
 
 **1. atoi**
 
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    char *str = "4";
+
+    printf("%d\n", atoi(str));
+}
+```
+
 **2. strtol**
 
 **3. strtod**
@@ -1174,7 +1210,7 @@ char *str = "Hello";
 
 **1. malloc**
 
-The `malloc` function is a C function that is used to allocate memory dynamically. It is declared in `stdlib.h`
+The `malloc` function is a C function that is used to allocate memory dynamically. It is declared in `stdlib.h`. The memory allocated by `malloc` may contain the old data that is used by other programs.
 
 The prototype is as follows:
 
@@ -1201,7 +1237,38 @@ int main()
 }
 ```
 
+`malloc` makes a call to the underlying operating system call to allocate the heap memory.
+
+Once the memory is allocated, it can only be freed with the `free`.
+
 **2. calloc**
+
+The `calloc` function is a C function that is used to allocate memory dynamically. It is declared in `stdlib.h`. Once the memory is allocated, it is cleared and returned to the caller.
+
+The prototype is as follows:
+
+```c
+void *calloc(int n_elements, int size);
+```
+
+The example code is as follows.
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int *a;
+
+    a = calloc(1, sizeof(int));
+    *a = 4;
+
+    printf("a %p *a %d\n", a, *a);
+
+    return 0;
+}
+```
 
 **3. realloc**
 
@@ -1338,13 +1405,105 @@ int main()
 }
 ```
 
+A structure can be inside another structure as well.
+
+```c
+struct book {
+    char book_name[10];
+    char book_author[10];
+};
+
+struct shelf {
+    struct book book;
+    int n_papers;
+}
+```
+
+The elements are accessed as follows.
+
+```c
+struct shelf s;
+
+void set_book(struct book *b, char *book_name, char *book_author)
+{
+    strcpy(b->book_name, book_name);
+    strcpy(b->book_author, book_author);
+}
+
+void set_shelf(char *book_name, char *book_author, int n_papers)
+{
+    s.n_papers = n_papers;
+    set_book(&s.b, book_name, book_author);
+}
+```
+
+The variable `b` of the type `struct book` is passed as a pointer to the `set_book`. The function `set_book` sets the book_name and book_author.
+
+An array of structures is possible too.
+
+```c
+struct book {
+    char book_name[10];
+    char book_author[10];
+};
+
+struct shelf {
+    struct book books[10];
+    int n_papers;
+}
+```
+
 ### Bit fields
 
 ### Structure packing
 
-### Structure pointer
-
 ## Enumeration
+
+Enumerations in C are similar to macros. An example of an enum is as shown below.
+
+```c
+enum army {
+    Snipers,
+    Medics,
+    Seals,
+};
+```
+
+The elements in the enum are accessed the following way.
+
+```c
+enum army sniper_team;
+
+sniper_team = Snipers;
+```
+
+The first element of the enum always start with 0 when uninitialized.
+
+The elements in the `enum` can be initialized with values too. Lets see the following definition.
+
+```c
+enum army {
+    Snipers = 10,
+    Medics,
+    Seals,
+};
+```
+
+The rest of elements are incremented by 1 every time. For example, Medics will become 11 and Seals will become 12.
+
+The below declaration is valid as well.
+
+```c
+enum army {
+    Snipers = 10,
+    Medics = 12,
+    Seals,
+}
+```
+
+The enumeration `Seals` now becomes 13.
+
+The enumerations are like integers. If assigned a `double` value to an enumeration, results in compiler error.
 
 ## Unions
 
@@ -1356,6 +1515,7 @@ int main()
 
 The `stdint.h` from libc has further more data types. See `/usr/include/stdint.h`
 The `limits.h` from libc contains all the ranges of the base types. See `/usr/include/limits.h`.
+The `stdlib.h` from the libc contains the prototypes for `atoi`, `malloc`, `calloc`, `realloc` and `free`.
 
 ### Compilation of C program
 
@@ -1443,6 +1603,30 @@ int main()
 
 **3. Writing to a file**
 
+```c
+#include <stdio.h>
+
+int main()
+{
+    const char *filename = "./test.txt";
+    char msg[1024];
+    FILE *fp;
+    int ret = -1;
+
+    fp = fopen(filename, "w");
+    if (fp) {
+        fputs("Hello World", fp);
+        fclose(fp);
+        ret = 0;
+    }
+
+    return ret;
+}
+```
+
+**4. Copying a file**
+
+
 #### Operating with the binary files
 
 **1. Reading and Writing to a binary file**
@@ -1467,15 +1651,39 @@ int main()
 
 #### auto
 
+### Allocating and Freeing
+
 ## Classes
 
 Classes in C++ are similar to the structures in C. The Class is enclosure for data and operations on the data.
+
+A class would generally look like this.
+
+```cpp
+class <name> {
+    public:
+        <variable_type > variable;
+        <return_type> function_prototype(parameters..);
+
+    protected:
+        <variable_type > variable;
+        <return_type> function_prototype(parameters..);
+
+    private:
+        <variable_type > variable;
+        <return_type> function_prototype(parameters..);
+};
+```
 
 ### Constructors and Destructors
 
 **Copy constructor**
 
 **Move constructor**
+
+**this pointer**
+
+**Virtual functions**
 
 ## Polymorphism
 
@@ -1486,6 +1694,13 @@ Classes in C++ are similar to the structures in C. The Class is enclosure for da
 ### Multiple inheritance
 
 ### Abstract Classes
+
+```cpp
+class abstract_class {
+    public:
+        virtual function_return function_prototype(parameters..) = 0;
+}
+```
 
 ## Templates
 
