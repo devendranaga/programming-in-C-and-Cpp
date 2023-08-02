@@ -283,6 +283,8 @@ int main()
     return 0;
 }
 ```
+<i>Example.4 Pre increment operator</i>
+
 
 The above program prints the value 1.
 
@@ -300,10 +302,15 @@ int main()
     return 0;
 }
 ```
+<i>Example.5 Post increment operator</i>
+
 
 The above program prints the value 0.
 
-This is generally called the undefined behavior. The language leaves the behavior upto the compiler. The `++ i` used, this is caleld prefix notation and the `i ++` is the postfix notation.
+This is generally called the undefined behavior. The language leaves the behavior upto the compiler. The `++ i` used, this is called prefix notation and the `i ++` is the postfix notation.
+
+In general, it is upto the programmer to choose `++i` or `i++` appropriately.
+However, choosing `++i` makes it less paranoid when debugging the software.
 
 More usecases of `++` and `--` in `while` and `for`.
 
@@ -508,6 +515,28 @@ n is 10
 ```
 
 In some cases the fallthroughs are needed to have execute a series of statements for more than one case types.
+
+The `switch` statement can also be used with characters. However, it cannot be used with strings. Strings are discussed more below. Below program is an example usage of the `switch` statement with character.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    char p = 't';
+
+    switch (p) {
+        case 't':
+            printf("value is t\n");
+        break;
+        default:
+            printf("value is %c\n", p);
+        break;
+    }
+}
+```
+
+In general, the `default` statement can be omitted. The `switch` statement must atleast have one `case`.
 
 **4. Trigraph ?: sequence**
 
