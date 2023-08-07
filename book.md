@@ -1202,6 +1202,10 @@ int string_copy(char *dst, unsigned int dst_len, const char *src)
 
 **1. atoi**
 
+The standard library function `atoi` converts a given input string to integer. It is declared in `stdlib.h`.
+
+Below is one example:
+
 ```c
 #include <stdio.h>
 #include <stdlib.h>
@@ -1214,7 +1218,63 @@ int main()
 }
 ```
 
+Lets see another example:
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    char *str = "4a";
+
+    printf("%d\n", atoi(str));
+}
+
+```
+
+This results in value `0`, in this case the value `0` is still legit if its taken as input. Since the input is not known. This can result in ambiguity if the result is right or wrong.
+
+So the preference is generally not to use `atoi` when writing software.
+
+
 **2. strtol**
+
+The standard library function `strtol` converts a given input string to integer. It is delcared in `stdlib.h`.
+
+The function prototype is as follows:
+
+```c
+long strtol(const char *in, char **err, int dec_or_hex);
+```
+
+In the above function the `err` argument describes if the input is incorrect. This is checked to find out if the returned converted `long` value is legit.
+
+The argument `dec_or_hex` is basically `10` if the input `in` is decimal or `16` if the input is hexadecimal in format `0x1`.
+
+Below is one example:
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    char *number = "102";
+    char *err = NULL;
+    long num_long;
+
+    num_long = strtol(number, &err, 10);
+    if (err && (*err != '\0')) {
+        printf("failed to parse number\n");
+        return -1;
+    }
+    printf("num_long %d\n", num_long);
+
+    return 0;
+}
+
+```
 
 **3. strtod**
 
@@ -1229,6 +1289,44 @@ The below statement is a string that is allocated at compile time and the `str` 
 ```c
 char *str = "Hello";
 ```
+
+A pointer of any type is possible. 
+
+```c
+int *p;
+```
+
+declares an integer pointer.
+
+```c
+int val = 4;
+int *v = &val;
+```
+
+declares an integer `val` and a pointer `v` holding the address of the variable `val`. The `&` denotes the address when placed before the variable.
+
+Pointers can be printed with `%p` format specifier.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int val = 4;
+    int *v = &val;
+
+    printf("%d %p\n", val, v);
+}
+```
+
+A size of a pointer can be evaluated as following.
+
+```c
+int *v;
+int size = sizeof(v);
+```
+
+On a 64-bit machine, the size results in 8 bytes.
 
 ### Pass by value and Pass by reference in functions
 
@@ -1534,6 +1632,44 @@ The enumeration `Seals` now becomes 13.
 
 The enumerations are like integers. If assigned a `double` value to an enumeration, results in compiler error.
 
+The size of the enum can as well be calculated with `sizeof`.
+
+```c
+#include <stdio.h>
+
+enum army {
+    Snipers,
+    Medics,
+    Seals,
+};
+
+int main()
+{
+    printf("size %lu\n", sizeof(enum army));
+
+    return 0;
+}
+```
+
+We can have a pointer to the enum as well.
+
+```c
+enum army {
+    Snipers,
+    Medics,
+    Seals,
+};
+
+enum army charlie_1, *charlie_2;
+
+charlie_2 = &charlie_1;
+
+```
+
+is perfectly valid.
+
+But most of the cases we never use enum pointers as they occupy only few bytes (4 or 8).
+
 ## Unions
 
 ## Appendix A
@@ -1713,6 +1849,27 @@ class <name> {
 **this pointer**
 
 **Virtual functions**
+
+## namespaces
+
+Namespace is a concept to allocate a particular name for one or more classes or functions.
+
+The `using namespace` is used to include a particular namespace without including its name directly when calling its classes or functions defined in it.
+
+```cpp
+#include <iostream>
+
+using namespace std;
+
+int main()
+{
+    cout << "test\n";
+
+    return 0;
+}
+```
+
+Which could've been the reference of `cout` with `std::cout` without the namespace.
 
 ## Polymorphism
 
