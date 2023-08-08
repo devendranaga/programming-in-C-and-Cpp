@@ -949,6 +949,46 @@ int main()
 
 **3. Three Dimensional Arrays**
 
+A 3 dimensional array is a group of 2-D arrays. Thet are denoted as follows,
+
+```c
+int array[10][20][40];
+```
+
+The below example shows how a 3-D array is used.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int array[10][20][40];
+    int i;
+    int j;
+    int k;
+
+    for (i = 0; i < 10; i ++) {
+        for (j = 0; j < 20; j ++) {
+            for (k = 0; k < 40; k ++) {
+                array[i][j][k] = 10 + i;
+            }
+        }
+    }
+
+    for (i = 0; i < 10; i ++) {
+        for (j = 0; j < 20; j ++) {
+            for (k = 0; k < 40; k ++) {
+                printf("array[%d][%d][%d] = %d\n", i, j, k, a[i][j][k]);
+            }
+        }
+    }
+
+    printf("\n");
+    return 0;
+}
+
+```
+
 The usecases of arrays range in many places, such as grouping a set of characters together, or grouping of similar types together to represent a hardware device or group of same hardware devices and so on. Also arrays play a big role in search and sort techniques.
 
 ## Macros
@@ -965,7 +1005,17 @@ In the above example we used `#include <stdio.h>`, where `#include` is a directi
 Function in a C program is a group of instructions. Functions allow us to break a large program into pieces of understandable segments. Each segment with some defined 
 business logic, logical implementation.
 
-A function has none, one or more input arguments and returns or do not return anything.
+A function has none, one or more input arguments and returns or do not return anything. A prototype is as follows,
+
+```c
+void function(void)
+```
+
+or more generally,
+
+```c
+return-type function-name(arguments, ..).
+```
 
 For example,
 
@@ -1228,7 +1278,47 @@ int string_copy(char *dst, unsigned int dst_len, const char *src)
 
 **3. strcat**
 
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+    char *str = "hello";
+    char *ptr = "mangoes";
+    char dst[20];
+
+    strcpy(dst, str);
+    strcat(dst, " ");
+    strcat(Dst, ptr);
+
+    return 0;
+}
+
+```
+
 **4. strcmp**
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+    char *str = "hello";
+    char *str_1 = "hello";
+    char *str_2 = "Hello";
+    int res_1, res_2;
+
+    res_1 = strcmp(str, str_1);
+    res_2 = strcmp(str, str_2);
+
+    printf("res_1 %d res_2 %d\n", res_1, res_2);
+
+    return 0;
+}
+
+```
 
 **5. strchr**
 
@@ -1370,6 +1460,9 @@ On a 64-bit machine, the size results in 8 bytes.
 
 **The void pointer**
 
+#### Pointers and Arrays
+
+###
 
 ## Dynamic Memory Allocation
 
@@ -1713,6 +1806,15 @@ But most of the cases we never use enum pointers as they occupy only few bytes (
 ## Appendix A
 
 ### Significance of header files
+
+Header files can include structures, macro definitions, and function prototypes.
+Sometimes they even contain inline functions.
+
+Here are few advantages:
+
+1. They can be used to group related functionality. Provides structure to the program when separated well.
+2. They can be used to expose the prototypes, macro definitions and structures to other files. The other files can use these prototypes to avoid implicit calls.
+3. Best way to distribute the software in package of header files and library `.so` or `.a` files.
 
 ### Header description
 
