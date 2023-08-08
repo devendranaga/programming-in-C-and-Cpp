@@ -390,7 +390,7 @@ int main()
     char p = 'd';
 
     if (p == 'd') {
-        printf("p '%c' is %c\n", p);
+        printf("p '%c' is %c\n", p, 'd');
     } else {
         printf("p '%c' is not 'd'\n", p);
     }
@@ -402,6 +402,34 @@ int main()
 A conditional check `if (p)` is also a valid check , but this check only check if the value is non zero. If the value is 0, then the statements under `if (p)` never executes. Understand that in C, the conditional checks depend on the value in the variable.
 
 Generally the `else` statement does not have to follow the `if` statement. But it is a good practise to have an `else` statement if needed.
+
+Let us consider the below program.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    char p = 'd';
+
+    if (p = 'f') {
+        printf("p '%c' is %c\n", p, 'd');
+    }
+
+    return 0;
+}
+```
+
+Notice the mistake? 
+
+The `if` conditional have the assignment operator than the equality test. This results in plain assignment which executes and so the `printf` inside the `if` will execute and prints the following:
+
+```bash
+p 'f' is d
+```
+
+We generally tend to avoid assignment statements inside the `if` to prevent getting into such kind of issues.
+
 
 **2. if else-if statement**
 
@@ -872,6 +900,16 @@ int main()
     return 0;
 }
 ```
+
+General way sometimes tend to be the use of `memset` which is discussed in below sections. But the below example shows how to initialize an array.
+
+```c
+int a[10];
+
+memset(a, 0, sizeof(a));
+```
+
+Sets all the elements of the array `a` to 0.
 
 **2. Two Dimensional Arrays**
 
