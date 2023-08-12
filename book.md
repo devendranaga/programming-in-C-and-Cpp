@@ -1272,7 +1272,15 @@ The standard library provides below or more of the functions to manipulate the s
 
 **1. strlen**
 
-The library function `strlen` is used to get the length of a string. Below is an example,
+The library function `strlen` is used to get the length of a string.
+
+The `strlen` prototype is as follows:
+
+```c
+int strlen(const char *str);
+```
+
+Below is an example,
 
 ```c
 #include <stdio.h>
@@ -1314,9 +1322,11 @@ in some cases. This sometimes causes crashes if lucky and sometimes executes oth
 
 So caution must be taken when creating and using the strings. Always null terminate the strings.
 
+Note that the `strlen` and `string_length` functions never check if the input is a `NULL`. The callers must take care of the pointer validity before calling `strlen`.
+
 **2. strcpy**
 
-The `strcopy` function is used to copy the source string into the destination.
+The `strcpy` function is used to copy the source string into the destination.
 
 Its prototype is as follows.
 
@@ -1386,6 +1396,44 @@ int main()
 
 ```
 
+```c
+#include <stdio.h>
+
+int string_cat(char *dst, const char *src)
+{
+    int i = 0;
+    int j = 0;
+    
+    while (dst[i] != '\0') {
+        i ++;
+    }
+
+    while (src[j] != '\0') {
+        dst[i] = src[j];
+        i ++;
+        j ++;
+    }
+    dst[i] = '\0';
+
+    return j;
+}
+
+int main()
+{
+    char *src = "test";
+    char dst[30] = "dest";
+
+    string_cat(dst, src);
+
+    printf("dst %s\n", dst);
+
+    return 0;
+}
+
+
+```
+
+
 **4. strcmp**
 
 ```c
@@ -1409,7 +1457,58 @@ int main()
 
 ```
 
+```c
+
+int string_len(const char *str)
+{
+    int i = 0;
+
+    while (str[i] != '\0') {
+        i ++;
+    }
+
+    return i;
+}
+
+int string_cmp(const char *str1, const char *str2)
+{
+    int i = 0;
+
+    if (string_len(str1) != string_len(str2)) {
+        return -1;
+    }
+
+    while (str1[i] != '\0') {
+        if (str1[i] != str2[i]) {
+            return str1[i] - str2[i];
+        }
+    }
+
+    return 0;
+}
+```
+
+
 **5. strchr**
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+    char *str = "english movies";
+    char *pos;
+
+    pos = strchr(str, 'm');
+    if (pos) {
+        printf("pos '%s'\n", pos);
+    }
+
+    return 0;
+}
+
+```
 
 **6. memcmp**
 
@@ -1494,6 +1593,29 @@ int main()
 ```
 
 **3. strtod**
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    char *str = "3.3";
+    char *err = NULL;
+    double val;
+
+    val = strtod(str, &err);
+    if (err && (err[0] != '\0')) {
+        return -1;
+    }
+
+    printf("val %f\n", val);
+
+    return 0;
+}
+
+```
+
 
 **4. strtoul**
 
