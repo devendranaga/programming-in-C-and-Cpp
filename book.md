@@ -901,6 +901,8 @@ int main()
 }
 ```
 
+This example prints the first element as 10 and rest as 0.
+
 General way sometimes tend to be the use of `memset` which is discussed in below sections. But the below example shows how to initialize an array.
 
 ```c
@@ -999,11 +1001,60 @@ In the above example we used `#include <stdio.h>`, where `#include` is a directi
 
 **#define macro**
 
+**#undef macro**
+
+**#ifdef macro**
+
+The `#ifdef` macro checks if a certain macro is defined and if so preprocessor enables the portion of code that is between the `#ifdef` and `#endif`. The `#ifdef` is always followed by `#endif` or `#else` statement.
+
+For example,
+
+```c
+int a = 10;
+#ifdef CONFIG_MACRO
+a = 5;
+#else
+a = 6;
+#endif
+```
+
+Will set a to 5 if `CONFIG_MACRO` is defined or 6 otherwise.
+
+Below example shows how to define the macro.
+
+```c
+#include <stdio.h>
+
+#define CONFIG_MACRO
+
+int main()
+{
+    int a = 10;
+
+#ifdef CONFIG_MACRO
+    a = 5;
+#else
+    a = 6;
+#endif
+
+    printf("%d\n", a);
+}
+
+```
+
+Defining a simple `#define CONFIG_MACRO` is enough to enable the statements under the `#ifdef`. In general these can be passed as command line arguments instead to the compiler. For example,
+
+```bash
+gcc -DCONFIG_MACRO macro.c
+```
+
+The argument `-D` to the `gcc` accepts the macros and many number of -Ds can be given as arguments.
+
+The `#ifndef` macro is a negation of `#ifdef` where if the particular macro variable is not defined, preprocessor will enable that portion of the code.
 
 ## Functions
 
-Function in a C program is a group of instructions. Functions allow us to break a large program into pieces of understandable segments. Each segment with some defined 
-business logic, logical implementation.
+Function in a C program is a group of instructions. Functions allow us to break a large program into pieces of understandable segments. Each segment with some defined business logic and logical implementation.
 
 A function has none, one or more input arguments and returns or do not return anything. A prototype is as follows,
 
@@ -1052,6 +1103,8 @@ void print_hello()
 comprise the body of the function. Its also referred as function definition. A program typically contains more than one function.
 
 `main()` is also a function which is the starting point of a program.
+
+If the `main()` is not defined, then the compilation results in undefined error. In general the linker expects `main()` to be defined as it is expected by the sequence before it calling `main()`. Who calls `main()`? For this, the short answer is the call is defined somewhere in the `libc`.
 
 A function can only have one signature in C (A function can have many signatures in C++). `main()` prototypes are many unlike many other functions. Some of the most used prototypes are as follows.
 
@@ -1132,6 +1185,39 @@ Variadic functions are the ones that can accept infinite arguments as input to t
 
 The header `stdarg.h` contains the macros and helper functions to make variadic functions possible.
 
+There are 2 important functions / macros in `stdarg.h`.
+
+```c
+va_start
+va_end
+```
+
+Libc also provide few more variadic functions that takes in the arguments.
+
+**writing your own printf**
+
+```c
+#include <stdio.h>
+#include <stdarg.h>
+
+void log_printf(const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+}
+
+int main()
+{
+    int a = 10;
+    log_printf("test: test message a=%d\n", a);
+}
+
+```
+
+
 ### Function like macros
 
 Since we read about macros above, we can rewrite the above functions as follows.
@@ -1156,6 +1242,9 @@ int main()
     return 0;
 }
 ```
+
+### inline functions
+
 
 ## Strings
 
