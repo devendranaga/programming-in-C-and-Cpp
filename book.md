@@ -1671,7 +1671,58 @@ On a 64-bit machine, the size results in 8 bytes.
 
 **The void pointer**
 
+The void pointer is a generic pointer that can be assigned as an address to any structure, pointer or a variable. Below is one example:
+
+```c
+int a[10];
+void *p;
+
+p = &a[0];
+```
+
+The void pointer cannot be dereferenced because dereferencing involve deducing the type it points, since its void the compiler wouldn't know which type it has to
+decode. So a typecast is required or in some cases assignment back to its type.
+
 #### Pointers and Arrays
+
+A Pointer to an array can be simply assigned as follows.
+
+```c
+int a[10];
+int *p;
+
+p = a;
+```
+
+or `p = &a[0]`.
+
+The pointer `p` assigned as the pointer to the first element of the array.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int a[10];
+    int *p;
+    int i;
+
+    for (i = 0; i < sizeof(a) / sizeof(a[0]; i ++) {
+        a[i] = i;
+    }
+
+    p = a;
+
+    for (i = 0; i < sizeof(a) / sizeof(a[0]); i ++) {
+        printf("a[%d] = %d\n", i, p[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
+
+```
+
 
 ###
 
@@ -2250,6 +2301,31 @@ class abstract_class {
 ### Threads
 
 C++ implements abstraction of threads based upon the pthreads. The class `std::thread` defines the thread interface.
+
+
+Creating a thread is a simple job of declaring a thread object and passing the function that serves as a thread function.
+
+Below is one example:
+
+```c
+#include <iostream>
+#include <thread>
+
+void thread_f()
+{
+	std::cout << "in thread" << std::endl;
+}
+
+int main()
+{
+	std::thread t(thread_f);
+
+	std::cout << "starting thread" << std::endl;
+	t.join();
+	std::cout << "joined thread" << std::endl;
+}
+
+```
 
 ### File systems
 
