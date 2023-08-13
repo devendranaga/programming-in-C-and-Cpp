@@ -1001,7 +1001,55 @@ In the above example we used `#include <stdio.h>`, where `#include` is a directi
 
 **#define macro**
 
+The preprocessor stage, replaces the macros with the actual values present in the macro definition.
+
+The macro `#define` defines macro constants. An example is as follows.
+
+```c
+#define TWO 2
+```
+
+Macro statements are used as substitutes for constants or some common operations.
+
+For example using,
+
+```c
+#define PI 3.1413
+
+double circumferance(double radius)
+{
+    return 2 * PI * radius;
+}
+
+```
+
+is more meaningful that using a constant value.
+
+```c
+#define ADD(_a, _b) ((_a) + (_b))
+```
+
+is an operation. We discuss about function like macros in the below sections.
+
+
+
 **#undef macro**
+
+The `#undef` macro undefines a macro. For example,
+
+```c
+
+#define PI 3.1413
+#undef PI
+
+double circumferance(double radius)
+{
+    return 2 * PI * radius;
+}
+
+```
+
+results in compiler error as the preprocessor removes `PI`.
 
 **#ifdef macro**
 
@@ -1511,6 +1559,23 @@ int main()
 ```
 
 **6. memcmp**
+
+```c
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+
+int main()
+{
+    uint8_t buf1[] = {0x01, 0x02, 0x03, 0x04, 0x01, 0x04, 0x4, 0x3};
+    uint8_t buf2[] = {0x01, 0x02, 0x03, 0x04, 0x01, 0x04, 0x4, 0x3};
+
+    printf("compare %d\n", (memcmp(buf1, buf2, 8) == 0));
+
+    return 0;
+}
+
+```
 
 **7. memcpy**
 
@@ -2080,9 +2145,11 @@ Here are few advantages:
 
 ### Header description
 
-The `stdint.h` from libc has further more data types. See `/usr/include/stdint.h`
-The `limits.h` from libc contains all the ranges of the base types. See `/usr/include/limits.h`.
-The `stdlib.h` from the libc contains the prototypes for `atoi`, `malloc`, `calloc`, `realloc` and `free`.
+The `stdio.h` contains prototypes for `printf`, `scanf`, `fprintf`, `fscanf`, `fopen`, `fclose`, `fgets` and so on.
+The `stdint.h` has further more data types. See `/usr/include/stdint.h`
+The `limits.h` contains all the ranges of the base types. See `/usr/include/limits.h`.
+The `stdlib.h` contains the prototypes for `atoi`, `malloc`, `calloc`, `realloc` and `free`.
+The `string.h` contains the prototypes for string related functions such as `strlen`, `strcpy`, `strcat`, `strcmp` and so on.
 
 ### Compilation of C program
 
@@ -2145,6 +2212,17 @@ int main()
 
 **2. Reading from a File**
 
+Reading a file is possible with the `fgets` function. The `fgets` prototype is as follows.
+
+```c
+void *fgets(char *str, uint32_t size, FILE *fp);
+```
+
+The `fgets` returns pointer to the string that is read, but also the argument `str` contain the data that is read from the file.
+The `size` argument specify the size of the string.
+
+Below is one example use of `fgets` function.
+
 ```c
 #include <stdio.h>
 
@@ -2167,6 +2245,21 @@ int main()
     return ret;
 }
 ```
+
+The `fgets` function adds the `\n` new line upon every call. When calling `strlen` on it, it returns one character more than the actual length. So the last characters of the read string are `\n\0`. To strip of the last character, we can go to the end of the string and one character before and assign `\0` to it.
+
+Below is one way to do it.
+
+```c
+char msg[1024];
+
+fgets(msg, sizeof(msg), fp);
+
+/* replace '\n' with '\0'. */
+msg[strlen(msg) - 1] = '\0';
+
+```
+
 
 **3. Writing to a file**
 
@@ -2193,6 +2286,9 @@ int main()
 
 **4. Copying a file**
 
+**5. Number of characters in a file**
+
+**6. Finding the file size**
 
 #### Operating with the binary files
 
@@ -2273,30 +2369,23 @@ int main()
 
 Which could've been the reference of `cout` with `std::cout` without the namespace.
 
-## Polymorphism
+## Standard library
 
-## Inheritance
+### Arrays
 
-### Simple Inheritance
+### Strings
 
-### Multiple inheritance
+### Vectors
 
-### Abstract Classes
+### Lists
 
-```cpp
-class abstract_class {
-    public:
-        virtual function_return function_prototype(parameters..) = 0;
-}
-```
+### Queues
 
-## Templates
-
-## Appendix B
-
-### Scoppe and Lifetime
+### Maps
 
 #### shared_ptr, unique_ptr
+
+### File systems
 
 ### Threads
 
@@ -2327,7 +2416,36 @@ int main()
 
 ```
 
-### File systems
+### Mutexes
+
+### Conditional Variables
+
+## Polymorphism
+
+## Inheritance
+
+### Simple Inheritance
+
+### Multiple inheritance
+
+### Abstract Classes
+
+```cpp
+class abstract_class {
+    public:
+        virtual function_return function_prototype(parameters..) = 0;
+}
+```
+
+## Templates
+
+## Appendix B
+
+### Scoppe and Lifetime
+
+### Use cases
+
+#### Safe Queue
 
 ## Design Patterns
 
@@ -2361,9 +2479,92 @@ class singleton {
 }
 ```
 
+We delete the copy and move constructors so that only one instance that is created during the call to the static member function `instance` is the only instance that is available.
+
 **usecase.1: Logging utility**
 
+Singleton can be used when writing a logging utility that logs the message / debug message to something like console or to a file, but does not require instantiation everytime when we want to use the object.
+
+An example of it looks as follows:
+
+```cpp
+class log {
+    public:
+        static log *instance() {
+            static log l;
+            return &l;
+        }
+        ~log() { }
+        log(const log &) = delete;
+        const log &operator=(const log &) = delete;
+        log(const log &&) = delete;
+        const log &&operator=(const log &&) = delete;
+
+        int info(const char *msg, ...);
+        int verbose(const char *msg, ...);
+        int debug(const char *msg, ...);
+        int warn(const char *msg, ...);
+        int error(const char *msg, ...);
+        int fatal(const char *msg, ...);
+    private:
+        explicit log() { }
+};
+```
+
+The above class is a singleton that has many member functions for logging such as,
+
+1. info
+2. verbose
+3. debug
+4. warning
+5. error
+6. fatal
+
+The member functions of this singleton can be accessed from anywhere as long as they include the header file that this class belongs.
+
+The call can be simply made as :
+
+```cpp
+log *l = log::instance();
+
+l->info("info message\n");
+```
+
+or 
+
+```cpp
+log::instance()->info("info message\n");
+```
+
 **usecase.2: Datastore**
+
+Data store is another use of singleton class. Lets see the below class:
+
+```cpp
+class key_val_datastore {
+    public:
+        static key_val_datastore *instance() {
+            static key_val_datastore ds;
+            return &ds;
+        }
+        ~key_val_datastore() { }
+        key_val_datastore(const key_val_datastore &) = delete;
+        const key_val_datastore &operator=(const key_val_datastore &) = delete;
+        key_val_datastore(const key_val_datastore &&) = delete;
+        const key_val_datastore &&operator=(const key_val_datastore &&) = delete;
+        
+        int write(uint32_t val);
+        int write(std::string val);
+        int read(uint32_t &val);
+        int read(std::string &val);
+    private:
+        explicit key_val_datastore() { }
+};
+```
+
+Just as in the usecase 1, the data store can be read and written with the member functions.
+
+Ofcourse there will be parallel accesses, which can be sequentialized with the use of mutexes.
 
 # Appendix C
 
@@ -2440,6 +2641,23 @@ sudo apt install make cmake
 
 **2. Creating library**
 
+```cmake
+cmake_minimum_required(VERSION 3.9)
+project(Example_Lib)
+
+set(LIB_SRC
+        ./file_1.c)
+
+add_library(file ${LIB_SRC})
+
+```
+
+The `add_library` instructs the cmake to create a static library `libfile.a`.
+
+**3. Linking with libraries**
+
+**4. Adding CFLAGS and CPPFLAGS**
+
 
 # Data Structures
 
@@ -2463,7 +2681,7 @@ The linked list structure looks as follows.
 
 ```c
 struct linked_list {
-    void *data;
+    void *elem;
     struct linked_list *next;
 }
 ```
@@ -2477,10 +2695,353 @@ Below are some of the general operations on the linked list.
 | 1 | `add` | Add an element to the list at the end |
 | 2 | `add_head` | Add an element to the list at the head |
 | 3 | `delete` | delete an element from the list |
-| 4 | `insert` | insert an element at a particular position in the list |
-| 5 | `find` | find an element in the list |
-| 6 | `count` | count the number of elements in the list |
-| 7 | `for_each` | iterate through each eement in the list |
+| 4 | `find` | find an element in the list |
+| 5 | `count` | count the number of elements in the list |
+| 6 | `for_each` | iterate through each eement in the list |
+| 7 | `print` | print all the elements of the list |
+
+Lets define two global variables `head` and `tail`.
+
+```c
+static struct linked_list *head;
+static struct linked_list *tail;
+```
+
+We use two pointers `head` and `tail`. The `head` is used to iterate over each element from the beginning and `tail` is used to add element at the end.
+
+**1. add**
+
+Adding an element can be as simple as adding an element at the end.
+
+If there are no elements in the list, add the element at the `head`.
+If there are elements in the list, add the element after `tail`. When ever an element is added point the `tail` to the last element.
+
+
+```c
+int add(void *data)
+{
+    struct linked_list *node;
+
+    node = calloc(1, sizeof(struct linked_list));
+    if (!node) {
+        return -1;
+    }
+
+    /* Assign the element */
+    node->elem = data;
+
+    if (!head) {
+        head = node;
+        tail = node;
+    } else {
+        tail->next = node;
+        tail = node;
+    }
+
+    return 0;
+}
+
+```
+
+Iterating over the elements is simple as using a `while` or `do..while` or `for` loop.
+
+**2. add_head**
+
+```c
+int add_head(void *data)
+{
+    struct linked_list *node;
+
+    node = calloc(1, sizeof(struct linked_list));
+    if (!node) {
+        return -1;
+    }
+
+    node->elem = data;
+
+    if (!head) {
+        head = node;
+        tail = node;
+    } else {
+        node->next = head;
+        head = node;
+    }
+
+    return 0;
+}
+
+```
+
+**3. delete**
+
+```c
+int delete(void *elem)
+{
+    struct linked_list *node;
+    struct linked_list *prev;
+
+    node = head;
+    prev = node;
+
+    if (head->elem == elem) {
+        head = head->next;
+        free(node);
+        return 0;
+    } else {
+        while (node != NULL) {
+            printf("%p %p\n", node->elem, elem);
+            if (node->elem == elem) {
+                prev->next = node->next;
+                if (node == tail) {
+                    tail = prev;
+                }
+                free(node);
+                return 0;
+            }
+            prev = node;
+            node = node->next;
+        }
+    }
+
+    return -1;
+}
+
+```
+
+**4. find**
+
+```c
+bool find(void *elem)
+{
+    struct linked_list *node;
+
+    for (node = head; node != NULL; node = node->next) {
+        if (node->elem == elem) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+```
+
+**5. count**
+
+```c
+int count()
+{
+    struct linked_list *node;
+    int n = 0;
+
+    for (node = head; node != NULL; node = node->next) {
+        n ++;
+    }
+
+    return n;
+}
+
+```
+
+**6. for_each**
+
+```c
+void for_each(void (*callback)(void *elem))
+{
+    struct linked_list *node;
+
+    for (node = head; node != NULL; node = node->next) {
+        if (callback) {
+            callback(node->elem);
+        }
+    }
+}
+
+```
+
+**7. print**
+
+Print the contents of the list by iterating over each element in the list.
+
+```c
+void print()
+{
+    struct linked_list *node;
+
+    printf("elements:\n");
+    for (node = head; node != NULL; node = node->next) {
+        int *data = node->elem;
+
+        printf("%d\n", *data);
+    }
+}
+
+```
+
+Below is one full example:
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+struct linked_list {
+    void *elem;
+    struct linked_list *next;
+};
+
+static struct linked_list *head;
+static struct linked_list *tail;
+
+int add(void *data)
+{
+    struct linked_list *node;
+
+    node = calloc(1, sizeof(struct linked_list));
+    if (!node) {
+        return -1;
+    }
+
+    node->elem = data;
+
+    if (!head) {
+        head = node;
+        tail = node;
+    } else {
+        tail->next = node;
+        tail = node;
+    }
+
+    return 0;
+}
+
+int add_head(void *data)
+{
+    struct linked_list *node;
+
+    node = calloc(1, sizeof(struct linked_list));
+    if (!node) {
+        return -1;
+    }
+
+    node->elem = data;
+
+    if (!head) {
+        head = node;
+        tail = node;
+    } else {
+        node->next = head;
+        head = node;
+    }
+
+    return 0;
+}
+
+int delete(void *elem)
+{
+    struct linked_list *node;
+    struct linked_list *prev;
+
+    node = head;
+    prev = node;
+
+    if (head->elem == elem) {
+        head = head->next;
+        free(node);
+        return 0;
+    } else {
+        while (node != NULL) {
+            printf("%p %p\n", node->elem, elem);
+            if (node->elem == elem) {
+                prev->next = node->next;
+                if (node == tail) {
+                    tail = prev;
+                }
+                free(node);
+                return 0;
+            }
+            prev = node;
+            node = node->next;
+        }
+    }
+
+    return -1;
+}
+
+bool find(void *elem)
+{
+    struct linked_list *node;
+
+    for (node = head; node != NULL; node = node->next) {
+        if (node->elem == elem) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+int count()
+{
+    struct linked_list *node;
+    int n = 0;
+
+    for (node = head; node != NULL; node = node->next) {
+        n ++;
+    }
+
+    return n;
+}
+
+void for_each(void (*callback)(void *elem))
+{
+    struct linked_list *node;
+
+    for (node = head; node != NULL; node = node->next) {
+        if (callback) {
+            callback(node->elem);
+        }
+    }
+}
+
+void print()
+{
+    struct linked_list *node;
+
+    printf("elements:\n");
+    for (node = head; node != NULL; node = node->next) {
+        int *data = node->elem;
+
+        printf("%d\n", *data);
+    }
+}
+
+int main()
+{
+    int a = 10;
+    int b = 20;
+    int c = 30;
+    int d = 40;
+    int e = 50;
+    int f = 60;
+
+    add(&a);
+    add(&b);
+    add(&c);
+    add(&d);
+    add(&e);
+    add(&f);
+
+    print();
+
+    delete(&a);
+    delete(&f);
+
+    add(&f);
+
+    print();
+}
+
+```
 
 
 ## Doubly Linked Lists
