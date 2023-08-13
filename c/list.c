@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 struct linked_list {
@@ -67,7 +68,6 @@ int delete(void *elem)
         return 0;
     } else {
         while (node != NULL) {
-            printf("%p %p\n", node->elem, elem);
             if (node->elem == elem) {
                 prev->next = node->next;
                 if (node == tail) {
@@ -132,6 +132,21 @@ void print()
     }
 }
 
+void clean()
+{
+    struct linked_list *node;
+    struct linked_list *prev;
+
+    node = head;
+    prev = head;
+
+    while (node) {
+        node = node->next;
+        free(prev);
+        prev = node;
+    }
+}
+
 int main()
 {
     int a = 10;
@@ -156,6 +171,8 @@ int main()
     add(&f);
 
     print();
+
+    clean();
 }
 
 

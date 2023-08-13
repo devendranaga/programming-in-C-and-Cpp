@@ -1579,6 +1579,29 @@ int main()
 
 **7. memcpy**
 
+```c
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+
+int main()
+{
+    uint8_t buf1[] = {0x01, 0x02, 0x04, 0x02, 0x03, 0x05, 0x03, 0x03};
+    uint8_t buf2[8];
+    int i;
+
+    memcpy(buf2, buf1, sizeof(buf1));
+    for (i = 0; i < sizeof(buf1); i ++) {
+        printf("%02x\n", buf2[i]);
+    }
+
+    return 0;
+}
+
+```
+
+**8. strdup**
+
 #### Library Functions to convert a string to other types
 
 **1. atoi**
@@ -1617,6 +1640,49 @@ int main()
 This results in value `0`, in this case the value `0` is still legit if its taken as input. Since the input is not known. This can result in ambiguity if the result is right or wrong.
 
 So the preference is generally not to use `atoi` when writing software.
+
+There is another way to convert the string to integer.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    char *str_int = "1343";
+    int intval;
+
+    sscanf(str_int, "%d", &intval);
+    printf("%d\n", intval);
+
+    return 0;
+}
+
+```
+
+We are using `sscanf` to read the input from the buffer into an integer.
+
+Lets consider an invalid string input,
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    char *str = "123a";
+    int intval;
+    int ret;
+
+    ret = sscanf(str, "%d", &intval);
+    if (ret != 1) {
+        printf("incorrect integer\n");
+    } else {
+        printf("val %d\n", intval);
+    }
+}
+
+```
+
+This results in `ret` being 123. However, results in no error and the integer is still read.
 
 
 **2. strtol**
@@ -1683,6 +1749,29 @@ int main()
 
 
 **4. strtoul**
+
+```c
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+int main()
+{
+    char *str = "4294967295";
+    uint32_t val;
+    char *err = NULL;
+
+    val = strtoul(str, &err, 10);
+    if (err && (err[0] != '\0')) {
+        return -1;
+    }
+
+    printf("val %u\n", val);
+
+    return 0;
+}
+
+```
 
 ## Pointers
 
@@ -1788,8 +1877,6 @@ int main()
 
 ```
 
-
-###
 
 ## Dynamic Memory Allocation
 
@@ -2369,9 +2456,78 @@ int main()
 
 Which could've been the reference of `cout` with `std::cout` without the namespace.
 
+We can define our own namespaces as well.
+
+```cpp
+namespace math
+{
+
+double square(double number) { return number * number; }
+
+}
+
+```
+
+Defines the function `square` in namespace `math`. Below is one way to use it.
+
+```cpp
+#include <iostream>
+
+namespace math
+{
+
+double square(double number) { return number * number; }
+
+}
+
+using namespace math;
+using namespace std;
+
+int main()
+{
+    double n;
+
+    n = square(3);
+    cout << "number " << n << endl;
+
+    return 0;
+}
+
+```
+
+Another way of using it as follows:
+
+```cpp
+#include <iostream>
+
+namespace math
+{
+
+double square(double number) { return number * number; }
+
+}
+
+int main()
+{
+    double n;
+
+    n = math::square(3);
+    std::cout << "number " << n << std::endl;
+
+    return 0;
+}
+
+```
+
+In order to access the funbction, we prefix the members with the namespace followed by the `::` operator.
+
 ## Standard library
 
+Standard library or STL in short is a group of helper function that ease up programming. Nowadays, they are more focussed towards helping programmers write OS independent software using C++.
+
 ### Arrays
+
+`std::array` defines an array type.
 
 ### Strings
 
@@ -2396,7 +2552,7 @@ Creating a thread is a simple job of declaring a thread object and passing the f
 
 Below is one example:
 
-```c
+```cpp
 #include <iostream>
 #include <thread>
 
@@ -2415,6 +2571,50 @@ int main()
 }
 
 ```
+
+Lets see below example, that creates two threads.
+
+```cpp
+#include <iostream>
+#include <thread>
+
+void thread_1()
+{
+	std::cout << "in thread_1" << std::endl;
+}
+
+void thread_2()
+{
+	std::cout << "in thread_2" << std::endl;
+}
+
+int main()
+{
+	std::thread t1(thread_1);
+	std::thread t2(thread_2);
+
+	std::cout << "waiting for threads" << std::endl;
+
+	t1.join();
+	t2.join();
+
+	std::cout << "stop" << std::endl;
+}
+
+```
+
+When compiling and running this program results in non-sequential outputs. For example.
+
+```bash
+in thread_1
+waiting for threads
+in thread_2
+stop
+```
+
+But the expectation is that the `main` function messages will appear before the thread function calls.
+
+In general, when threads are created by the operating system, the execution totally depends on the scheduler.
 
 ### Mutexes
 
@@ -2670,9 +2870,9 @@ Each item in chain is called the node. Each node contains data and a pointer to 
 Linked list structure looks as follows:
 
 ```
-|--------|    |--------|
-| item 1 |--->| item 2 |---> .... -> NULL
-|--------|    |--------|
+|--------|    |--------|    |--------|
+| item 1 |--->| item 2 |--->| item 3 |--> .... -> NULL
+|--------|    |--------|    |--------|
 ```
 
 The list always ends with a NULL pointer.
@@ -2699,6 +2899,7 @@ Below are some of the general operations on the linked list.
 | 5 | `count` | count the number of elements in the list |
 | 6 | `for_each` | iterate through each eement in the list |
 | 7 | `print` | print all the elements of the list |
+| 8 | `clean` | clean all the linked list and free up the memory allocated |
 
 Lets define two global variables `head` and `tail`.
 
@@ -2878,6 +3079,36 @@ void print()
 
 ```
 
+**8. clean**
+
+Cleaning up of linked list is required to free up the memory used by the linked list.
+
+Here's one way to cleanup a linked list.
+
+1. Take two pointers: `node` and `prev`.
+2. `node` points to head and `prev` points to `node`.
+3. Move `node` forward. free the `prev` pointer.
+4. Set `prev` pointer back to `node`.
+5. Repeat until `node` reaches end.
+
+```c
+void clean()
+{
+    struct linked_list *node;
+    struct linked_list *prev;
+
+    node = head;
+    prev = head;
+
+    while (node) {
+        node = node->next;
+        free(prev);
+        prev = node;
+    }
+}
+
+```
+
 Below is one full example:
 
 ```c
@@ -3015,6 +3246,21 @@ void print()
     }
 }
 
+void clean()
+{
+    struct linked_list *node;
+    struct linked_list *prev;
+
+    node = head;
+    prev = head;
+
+    while (node) {
+        node = node->next;
+        free(prev);
+        prev = node;
+    }
+}
+
 int main()
 {
     int a = 10;
@@ -3039,6 +3285,8 @@ int main()
     add(&f);
 
     print();
+
+    clean();
 }
 
 ```
