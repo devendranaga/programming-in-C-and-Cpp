@@ -2525,6 +2525,64 @@ In order to access the funbction, we prefix the members with the namespace follo
 
 Standard library or STL in short is a group of helper function that ease up programming. Nowadays, they are more focussed towards helping programmers write OS independent software using C++.
 
+### noexcept
+
+The `noexcept` is an operator and also a specifier.
+
+
+**noexcept specifier**
+
+The `noexcept` specifier informs the compiler that the particular function / constructor / destructor does not produce an exception. It also governs some underlying rules when it comes to inherited classes.
+
+A `noexcept` specifier can be attached to the end of the function as:
+
+```cpp
+int f(void) noexcept; // says function does not throw an exception
+int g(void); // may throw an exception
+```
+
+A function declared with `noexcept` specifier but throws, results in the library calling `std::terminate`. This makes the exception uncatchable.
+
+An overloaded function can have a different exception specification. For example, below example is valid.
+
+```cpp
+int f(void) noexcept;
+int f(std::string arg);
+
+```
+
+Below program covers almost all the `noexcept` cases:
+
+```cpp
+#include <iostream>
+
+void f() noexcept { std::cout << "f called" << std::endl; }
+void f(std::string arg) { std::cout << "f called with arg: " << arg << std::endl; }
+
+void g() noexcept { throw std::runtime_error("an exception g()"); }
+
+void p() { throw std::runtime_error("an exception p()"); }
+
+int main()
+{
+	f();
+	f("test");
+
+	try {
+		p();
+	} catch (std::exception &e) {
+		std::cout << "caught the exception from function p(): " << e.what() << std::endl;
+	}
+
+	try {
+		g();
+	} catch (...) {
+		std::cout << "caught the exception from function g()\n";
+	}
+}
+
+```
+
 ### Arrays
 
 `std::array` defines an array type.
@@ -2638,6 +2696,43 @@ class abstract_class {
 ```
 
 ## Templates
+
+**Usecase 1: Implementing std::array**
+
+```cpp
+#include <iostream>
+
+template <typename T, int n>
+class array {
+	public:
+		explicit array() = default;
+		~array() = default;
+
+		T &operator[](int index) { return array_[index]; }
+
+		T at(int index) { return array_[index]; }
+
+		int size() { return n; }
+
+		void clear() {
+			for (auto i = 0; i < n; i ++) {
+				array_[i] = 0;
+			}
+		}
+	private:
+		T array_[n];
+};
+
+int main()
+{
+	array<int, 10> a;
+
+	a[1] = 4;
+
+	std::cout << "array " << a[1] << std::endl;
+}
+
+```
 
 ## Appendix B
 
