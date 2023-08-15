@@ -3438,6 +3438,250 @@ Circular lists is similar to the linked list and the difference is that the last
 
 ## Stack
 
+Stacks are another data structure where the data entered first is data retrieved last or data entered in last is the data retrieved first.
+
+
+```
+|----------------|
+|     item n     |
+|----------------|
+|     ...        |
+|----------------|
+|     item 2     |
+|----------------|
+|     item 1     |
+|----------------|
+
+```
+
+Below are some operations that can be done with the stack data structure.
+
+| S.No | Name | Description |
+|------|------|-------------|
+| 1 | `top` | Get the top element of thes stack |
+| 2 | `push` | Push an element into the stack |
+| 3 | `pop` | Pop an element out of the stack |
+| 4 | `empty` | Clear elements in the stack |
+| 5 | `size` | Get the total size of elements in the stack |
+
+Stacks can be implemented with Linked lists as well.
+
+```c
+struct stack {
+    void *elem;
+    struct stack *next;
+};
+
+static struct stack *head;
+int count;
+```
+
+**1. top**
+
+```c
+void *top()
+{
+    return head->elem;
+}
+
+```
+
+**2. push**
+
+```c
+int push(void *elem)
+{
+    struct stack *node;
+
+    node = calloc(1, sizeof(struct stack));
+    if (!node) {
+        return -1;
+    }
+
+    node->elem = elem;
+
+    if (!head) {
+        head = node;
+    } else {
+        node->next = head;
+        head = node;
+    }
+
+    count ++;
+
+    return 0;
+}
+
+```
+
+**3. pop**
+
+```c
+void *pop()
+{
+    struct stack *node;
+    void *elem = NULL;
+
+    if (head) {
+        elem = head->elem;
+        node = head;
+        head = head->next;
+        free(node);
+        count --;
+    }
+
+    return elem;
+}
+
+```
+
+**4. empty**
+
+```c
+void empty(void (*callback)(void *elem))
+{
+    struct stack *node;
+    struct stack *prev;
+
+    node = head;
+    prev = head;
+
+    while (node) {
+        prev = node;
+        node = node->next;
+        if (callback) {
+            callback(prev->elem);
+        }
+        free(prev);
+    }
+}
+
+```
+
+**5. size**
+
+```c
+int size()
+{
+    return count;
+}
+
+```
+
+Below is one full implementation of stack example:
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+struct stack {
+    void *elem;
+    struct stack *next;
+};
+
+static struct stack *head;
+static int count;
+
+void *top()
+{
+    return head->elem;
+}
+
+int push(void *elem)
+{
+    struct stack *node;
+
+    node = calloc(1, sizeof(struct stack));
+    if (!node) {
+        return -1;
+    }
+
+    node->elem = elem;
+
+    if (!head) {
+        head = node;
+    } else {
+        node->next = head;
+        head = node;
+    }
+
+    count ++;
+
+    return 0;
+}
+
+void *pop()
+{
+    struct stack *node;
+    void *elem = NULL;
+
+    if (head) {
+        elem = head->elem;
+        node = head;
+        head = head->next;
+        free(node);
+        count --;
+    }
+
+    return elem;
+}
+
+int size()
+{
+    return count;
+}
+
+void empty(void (*callback)(void *elem))
+{
+    struct stack *node;
+    struct stack *prev;
+
+    node = head;
+    prev = head;
+
+    while (node) {
+        prev = node;
+        node = node->next;
+        if (callback) {
+            callback(prev->elem);
+        }
+        free(prev);
+    }
+}
+
+int main()
+{
+    int a = 1;
+    int b = 2;
+    int c = 3;
+    int d = 4;
+    int e = 5;
+    int f = 6;
+
+    push(&a);
+    push(&b);
+    push(&c);
+    push(&d);
+    push(&e);
+    push(&f);
+
+    printf("size : %d\n", size());
+
+    while (1) {
+        int *elem = pop();
+        if (elem == NULL) {
+            break;
+        }
+        printf("%d\n", *elem);
+    }
+
+    empty(NULL);
+
+    return 0;
+}
+
+```
+
 ## Queue
 
 ## Ring Buffer
