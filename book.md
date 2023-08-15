@@ -2411,6 +2411,14 @@ int main()
 
 # C++ programming
 
+## Introduction
+
+```bash
+sudo apt install gcc-g++
+```
+
+Compiling C++ programs is as simple as using `g++` instead of `gcc`.
+
 ## New operators in C++
 
 **1. The Reference (`&`) operator.**
@@ -2605,19 +2613,91 @@ int main()
 
 ```
 
+If a base class contains any of member functions with `noexcept` specifier then the derived class must also contain the `noexcept` specification. Without it, this results in compiler error.
+
+```cpp
+#include <iostream>
+
+class F {
+	public:
+		virtual void f() noexcept = 0;
+};
+
+class G : public F {
+	public:
+		void f() { std::cout << "in f()" << std::endl; }
+};
+
+int main()
+{
+	class G g;
+
+	g.f();
+}
+
+```
+
+Results in compiler error,
+
+```bash
+cpp/noexcept_inh.cc:10:22: error: looser exception specification on overriding virtual function ‘virtual void G::f()’
+   10 |                 void f() { std::cout << "in f()" << std::endl; }
+      |                      ^
+cpp/noexcept_inh.cc:5:30: note: overridden function is ‘virtual void F::f() noexcept’
+    5 |                 virtual void f() noexcept = 0;
+      |                              ^
+
+```
+
+However, a derived class can specify `noexcept` specifier although the base class do not have it.
+
+For example the below program compiles.
+
+```cpp
+#include <iostream>
+
+class F {
+	public:
+		virtual void f() = 0;
+};
+
+class G : public F {
+	public:
+		void f() noexcept { std::cout << "in f()" << std::endl; }
+};
+
+int main()
+{
+	class G g;
+
+	g.f();
+}
+
+```
+
 ### Arrays
 
 `std::array` defines an array type.
 
 ### Strings
 
+`std::string` defines a string type.
+
 ### Vectors
+
+`std::vector` defines a vector type.
 
 ### Lists
 
+`std::list` defines a list type.
+
 ### Queues
 
+`std::queue` defines a queue type.
+
 ### Maps
+
+`std::map` defines a map type.
 
 #### shared_ptr, unique_ptr
 
@@ -2764,11 +2844,91 @@ int main()
 
 #### Safe Queue
 
+```cpp
+#include <iostream>
+#include <mutex>
+#include <condition_variable>
+#include <thread>
+#include <queue>
+
+template <typename T>
+class safe_que {
+	public:
+		safe_que(const safe_que &) = delete;
+		const safe_que &operator=(const safe_que &) = delete;
+		safe_que(const safe_que &&) = delete;
+		const safe_que &&operator=(const safe_que &&) = delete;
+
+		/**
+		 * @brief - get an instance.
+		 */
+		static safe_que *instance() {
+			static safe_que q;
+			return &q;
+		}
+		~safe_que() { }
+
+		/**
+		 * @brief - add an element to the safe queue.
+		 */
+		void add(T &elem) {
+			std::unique_lock<std::mutex> lock(lock_);
+			items_.push(elem);
+			cond_.notify_all();
+		}
+
+		/**
+		 * @brief - get the element from the queue.
+		 */
+		void get(T &val) {
+			std::unique_lock<std::mutex> lock(lock_);
+			cond_.wait(lock);
+			val = items_.front();
+			items_.pop();
+		}
+
+	private:
+		explicit safe_que () { }
+		std::queue<T> items_;
+		std::mutex lock_;
+		std::condition_variable cond_;
+};
+
+void thread_f()
+{
+	safe_que<int> *q = safe_que<int>::instance();
+
+	while (1) {
+		int data;
+
+		/* Get the element from the queue. */
+		q->get(data);
+		printf("data %d\n", data);
+	}
+}
+
+int main()
+{
+	safe_que<int> *q = safe_que<int>::instance();
+	std::thread t(thread_f);
+	int count = 0;
+
+	/* Produce data every 100 msec. */
+	while (1) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		count ++;
+
+		q->add(count);
+	}
+}
+
+```
+
 ## Design Patterns
 
-### Factory design pattern
+### Factory Design pattern
 
-### Singleton pattern
+### Singleton Design pattern
 
 The singleton pattern is used when an object is being used by many other classes. One way to do is to instantiate it statically and return that instance.
 
@@ -2883,6 +3043,8 @@ Just as in the usecase 1, the data store can be read and written with the member
 
 Ofcourse there will be parallel accesses, which can be sequentialized with the use of mutexes.
 
+### Builder Design pattern
+
 # Appendix C
 
 ## Code organization for software development
@@ -2971,7 +3133,41 @@ add_library(file ${LIB_SRC})
 
 The `add_library` instructs the cmake to create a static library `libfile.a`.
 
+Below example creates a shared library.
+
+```cmake
+cmake_minimum_required(VERSION 3.9)
+project(Example_Lib)
+
+set(LIB_SRC
+        ./file_1.c)
+
+add_library(file SHARED ${LIB_SRC})
+
+```
+
+The `SHARED` specifier creates a `.so` file called `libfile.so`. Without mentioning `SHARED`, the `add_library` generates a `.a` file by default.
+
 **3. Linking with libraries**
+
+The `target_link_libraries` is used to link the library to the target binary.
+
+Below is one example:
+
+```cmake
+cmake_minimum_required(VERSION 3.9)
+project(Example_Bin)
+
+set(SRC
+        ./file.c)
+
+set(LIB_SRC
+        ./file_1.c)
+
+add_library(file ${LIB_SRC})
+add_executable(file_ops ${SRC})
+target_link_libraries(file_ops file)
+```
 
 **4. Adding CFLAGS and CPPFLAGS**
 
@@ -3511,8 +3707,8 @@ Stacks are another data structure where the data entered first is data retrieved
 
 
 ```
-|----------------|
-|     item n     |
+|----------------| 
+|     item n     |  <-- Add and Retrieve
 |----------------|
 |     ...        |
 |----------------|
@@ -3761,6 +3957,19 @@ int main()
 ## Queue
 
 The queue adds elements at the last and retrieves them at the first. For this we use two pointers `head` and `tail`.
+
+```
+|-------------|
+|   item 1    |  <-- First (Remove elements)
+|-------------|
+|   item 2    |
+|-------------|
+|    ...      |
+|-------------|
+|   item n    |  <-- Last (Add elments)
+|-------------|
+
+```
 
 The below structure definition is as follows:
 
