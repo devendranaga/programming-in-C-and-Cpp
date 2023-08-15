@@ -46,7 +46,7 @@ The `main()` is a function and the program always executes from `main()`.
 The function call `printf`, allows the program to write to a console.
 The header file `stdio.h` contains the prototype of `printf`.
 
-The `//` indicates comment line. Anything that goes after `//` for the entire line is ignored.
+The `//` indicates comment line. Anything that goes after `//` for the entire line is ignored. Generally these are called C++ styled comments. These are not multi line comments.
 
 There is another type of comment style that start with `/*` and ends with `*/`. This can be used as a multiline comment.
 
@@ -58,6 +58,8 @@ Here's one example,
  showing more than one line can be written.
  */
 ```
+
+The preference of using `//` or `/*` entirely depends on their coding style.
 
 The statement `return 0` specifies that the function returns 0. In C, a function may or may not return depend on the function signature.
 
@@ -678,6 +680,26 @@ int main()
 the `i = 0` statement in `for` executes only once. The `i < 10` statement executes everytime the loop repeats. The `i ++` statement executes everytime the statements in
 the `for` loop executes.
 
+Another way to do is the following:
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int i = 0;
+
+    for (;i < 10; i ++) {
+        printf("i %d\n", i);
+    }
+
+    return 0;
+}
+
+```
+
+The initializer statement can be left aside.
+
 The above `while (1)` can be re-written with `for` as follows.
 
 ```c
@@ -742,7 +764,7 @@ begin:
     }
 
     return 0;
-}
+}s
 ```
 
 We do not use `goto` in most of the programs for the following reasons:
@@ -3043,6 +3065,11 @@ Iterating over the elements is simple as using a `while` or `do..while` or `for`
 
 **2. add_head**
 
+Adding an element at the head is done as follows:
+
+1. Set `node->next` to `head`.
+2. Make `head` point to `node`.
+
 ```c
 int add_head(void *data)
 {
@@ -3070,6 +3097,23 @@ int add_head(void *data)
 
 **3. delete**
 
+Deleting an element from list need be considered two possibilities.
+
+1. If the given `elem` is at the `head`.
+    1. Save the `head` pointer at `node`.
+    2. Move the `head` to the next element.
+    3. Free up the saved `node`.
+2. If the given `elem` is somewhere in the middle.
+    1. Set `prev` and `node` to `head`.
+    2. Iterate over each element in the link.
+    3. If the `elem` pointers are matched skip the `node`.
+    4. Point the `prev->next` to `node->next`, moving the link.
+    5. Free up the `node`.
+
+There is a special case here if `elem` to delete is in the middle, the `node` can potentially be the `tail` pointer. Correct the `tail` pointer to old element `prev`.
+
+
+
 ```c
 int delete(void *elem)
 {
@@ -3085,7 +3129,6 @@ int delete(void *elem)
         return 0;
     } else {
         while (node != NULL) {
-            printf("%p %p\n", node->elem, elem);
             if (node->elem == elem) {
                 prev->next = node->next;
                 if (node == tail) {
@@ -3106,6 +3149,8 @@ int delete(void *elem)
 
 **4. find**
 
+The `find` iterates over each element and compares the `elem` pointer with the given pointer and returns `true` if both are same.
+
 ```c
 bool find(void *elem)
 {
@@ -3122,7 +3167,29 @@ bool find(void *elem)
 
 ```
 
+There is another way to perform `find`. This is to call the custom callback that returns `true` if matched and `false` if not. Below is an example:
+
+```c
+bool find(bool (*callback)(void *elem))
+{
+    struct linked_list *node;
+    bool found = false;
+
+    for (node = head; node != NULL; node = node->next) {
+        found = callback(node->elem);
+        if (found == true) {
+            break;
+        }
+    }
+
+    return found;
+}
+
+```
+
 **5. count**
+
+The `count` iterates over each link and increments the counter.
 
 ```c
 int count()
@@ -3140,6 +3207,8 @@ int count()
 ```
 
 **6. for_each**
+
+The `for_each` iterates over each link and calls the callback. The caller must pass the callback and the caller will get the element as the data.
 
 ```c
 void for_each(void (*callback)(void *elem))
@@ -3473,15 +3542,22 @@ struct stack {
 };
 
 static struct stack *head;
-int count;
+static int count;
 ```
+
+Elements are added at `head` and removed at `head`.
 
 **1. top**
 
 ```c
 void *top()
 {
-    return head->elem;
+    void *elem = NULL;
+
+    if (head) {
+        elem = head->elem;
+    }
+    return elem;
 }
 
 ```
@@ -3683,6 +3759,279 @@ int main()
 ```
 
 ## Queue
+
+The queue adds elements at the last and retrieves them at the first. For this we use two pointers `head` and `tail`.
+
+The below structure definition is as follows:
+
+```c
+struct queue {
+    void *elem;
+    struct queue *next;
+};
+
+static struct queue *head;
+static struct queue *tail;
+static int count;
+
+```
+
+The following are operations of queue:
+
+| S.No | Name | Description |
+|------|------|-------------|
+| 1 | `front` | Get the front element in the queue |
+| 2 | `back` | Get the back element in the queue |
+| 3 | `empty` | Empty the queue |
+| 4 | `size` | Get the number of elements in the queue |
+| 5 | `push` | Push an element in the queue |
+| 6 | `pop` | Pop an element from the queue |
+
+**1. front**
+
+```c
+void *front()
+{
+    void *elem;
+
+    if (head) {
+        elem = head->elem;
+    }
+
+    return elem;
+}
+
+```
+
+**2. back**
+
+```c
+void *back()
+{
+    void *elem;
+
+    if (tail) {
+        elem = tail->elem;
+    }
+
+    return elem;
+}
+
+```
+
+**3. empty**
+
+```c
+void empty(void (*callback)(void *elem))
+{
+    struct queue *node;
+    struct queue *prev;
+
+    node = head;
+    prev = head;
+
+    while (node) {
+        prev = node;
+        node = node->next;
+        if (callback) {
+            callback(prev->elem);
+        }
+        free(prev);
+    }
+    count = 0;
+}
+
+```
+
+**4. size**
+
+```c
+int size()
+{
+    return count;
+}
+
+```
+
+**5. push**
+
+```c
+int push(void *elem)
+{
+    struct queue *node;
+
+    node = calloc(1, sizeof(struct queue));
+    if (!node) {
+        return -1;
+    }
+
+    node->elem = elem;
+
+    if (!head) {
+        head = node;
+        tail = node;
+    } else {
+        tail->next = node;
+        tail = node;
+    }
+
+    return 0;
+}
+
+```
+
+**6. pop**
+
+```c
+void *pop()
+{
+    struct queue *node;
+    void *elem = NULL;
+
+    if (head != NULL) {
+        node = head;
+        elem = node->elem;
+        head = head->next;
+        free(node);
+    }
+
+    return elem;
+}
+
+```
+
+Below is an example:
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+struct queue {
+    void *elem;
+    struct queue *next;
+};
+
+static struct queue *head;
+static struct queue *tail;
+static int count;
+
+void *front()
+{
+    void *elem;
+
+    if (head) {
+        elem = head->elem;
+    }
+
+    return elem;
+}
+
+void *back()
+{
+    void *elem;
+
+    if (tail) {
+        elem = tail->elem;
+    }
+
+    return elem;
+}
+
+void empty(void (*callback)(void *elem))
+{
+    struct queue *node;
+    struct queue *prev;
+
+    node = head;
+    prev = head;
+
+    while (node) {
+        prev = node;
+        node = node->next;
+        if (callback) {
+            callback(prev->elem);
+        }
+        free(prev);
+    }
+    count = 0;
+}
+
+int size()
+{
+    return count;
+}
+
+int push(void *elem)
+{
+    struct queue *node;
+
+    node = calloc(1, sizeof(struct queue));
+    if (!node) {
+        return -1;
+    }
+
+    node->elem = elem;
+
+    if (!head) {
+        head = node;
+        tail = node;
+    } else {
+        tail->next = node;
+        tail = node;
+    }
+
+    return 0;
+}
+
+void *pop()
+{
+    struct queue *node;
+    void *elem = NULL;
+
+    if (head != NULL) {
+        node = head;
+        elem = node->elem;
+        head = head->next;
+        free(node);
+    }
+
+    return elem;
+}
+
+int main()
+{
+    int a = 10;
+    int b = 20;
+    int c = 30;
+    int d = 40;
+    int e = 50;
+    int f = 60;
+
+    push(&a);
+    push(&b);
+    push(&c);
+    push(&d);
+    push(&e);
+    push(&f);
+
+    printf("size : %d\n", size());
+    printf("Front: %d\n", *(int *)front());
+    printf("Back:  %d\n", *(int *)back());
+
+    while (1) {
+        int *elem = pop();
+        if (!elem) {
+            break;
+        }
+        printf("%d\n", *elem);
+    }
+
+    empty(NULL);
+
+    return 0;
+}
+
+```
 
 ## Ring Buffer
 
