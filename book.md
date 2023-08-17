@@ -2413,15 +2413,36 @@ int main()
 
 ## Introduction
 
+Compiling C++ programs is as simple as using `g++` instead of `gcc`. Here's how to install it in Ubuntu.
+
 ```bash
 sudo apt install gcc-g++
 ```
 
-Compiling C++ programs is as simple as using `g++` instead of `gcc`.
+Few conventions in C++:
 
+1. Source File extensions end with `cxx` or `cpp` or `cc`.
+2. Header file extensions end with `hxx` or `hpp` or `h`.
+3. The standard header files does not have to be included with `.h` extension.
+4. Structure and Enum names can be used without a `struct` prefix before them when declaring.
+
+
+## cout and cin
+
+`cout` is much similar to `printf` and `cin` is much similar to `fgets`.
+
+But the use of `cout` and `cin` are very different.
+
+Include header file `iostream` when using them.
+
+For example, 
 ## New operators in C++
 
 **1. The Reference (`&`) operator.**
+
+**2. new**
+
+**3. delete**
 
 ## New keywords in C++
 
@@ -2430,6 +2451,26 @@ Compiling C++ programs is as simple as using `g++` instead of `gcc`.
 #### explicit
 
 #### auto
+
+The `auto` keyword provides an automatic type deduction when used.
+
+An example,
+
+```cpp
+auto i = 10;
+```
+
+says its an integer but compiler automatically understands this when the value assigned to it is an `int`.
+
+```cpp
+auto i = 10; // an int
+auto p = 10.1; // a double
+auto t = "c++"; // a string
+```
+
+We use auto at times when writing a complex type becomes very hard. We will see in the below sections on more about `auto`.
+Remember that not all `auto` type deductions are as we expect.
+
 
 ### Allocating and Freeing
 
@@ -2549,7 +2590,9 @@ int main()
 
 ```
 
-In order to access the funbction, we prefix the members with the namespace followed by the `::` operator.
+In order to access the function, we prefix the members with the namespace followed by the `::` operator.
+
+
 
 ## Standard library
 
@@ -2693,13 +2736,140 @@ int main()
 
 ### Queues
 
-`std::queue` defines a queue type.
+`std::queue` defines a queue type. The `std::queue` can take any type. It is generally identified with templates as,
+
+```cpp
+template <typename T> std::queue<T>
+```
+
+The `T` argument is a template type, the type is deduced when the `std::queue` has been declared.
+
+```cpp
+std::queue<int> i; // a queue of ints
+
+struct P {
+    int p;
+};
+std::queue<P> p; // queue of structures (P)
+```
+
+The queue provides the following operations.
+
+| S.No | Name | Description |
+|------|------|-------------|
+| 1 | `front` | Get the first element of the queue |
+| 2 | `back` | Get the last element of the queue |
+| 3 | `push` | Push an element in queue |
+| 4 | `pop` | Pop an element from the queue |
+| 5 | `size` | Get the size of the elements |
+| 6 | `empty` | Check if there are any more elements in queue |
+
+Below is one usage of queue with simply integer data type.
+
+```cpp
+#include <iostream>
+#include <queue>
+
+int main()
+{
+	std::queue<int> q;
+	int size;
+
+	printf("q empty %d\n", q.empty());
+
+	q.push(1);
+	q.push(2);
+	q.push(3);
+	q.push(4);
+	q.push(5);
+	q.push(6);
+
+	printf("number of elements %lu, queue empty %d\n", q.size(), q.empty());
+	printf("front %d back %d\n", q.front(), q.back());
+
+	while (1) {
+		size = q.size();
+		if (size <= 0) {
+			break;
+		}
+
+		int val = q.front();
+		q.pop();
+		printf("val : %d\n", val);
+	}
+}
+
+```
+
+The general usecases of queues are the following:
+
+1. Producer and Consumer data sharing with a queue. Producer adds item in queue, consumer removes item from the queue.
+
+The above case apply to almost all real world problems involving multi threading. Multi threading is described below.
 
 ### Maps
 
 `std::map` defines a map type.
 
 #### shared_ptr, unique_ptr
+
+```cpp
+#include <iostream>
+#include <memory>
+
+struct P {
+	int val;
+};
+
+void print(std::shared_ptr<P> p)
+{
+	struct P *p1;
+
+	p1 = p.get();
+	printf("p->val %d deref->val %d\n", p->val, p1->val);
+	printf("p.val %d\n", (*p).val);
+	printf("use_count %ld\n", p.use_count());
+}
+
+int main()
+{
+	std::shared_ptr<P> ptr;
+
+	ptr = std::make_shared<P>();
+	ptr->val = 4;
+
+	print(ptr);
+
+	return 0;
+}
+
+```
+
+```cpp
+#include <iostream>
+#include <memory>
+
+struct P {
+	int val;
+};
+
+void print(std::unique_ptr<P> &p)
+{
+	printf("val %d\n", p->val);
+}
+
+int main()
+{
+	std::unique_ptr<P> ptr;
+
+	ptr = std::make_unique<P>();
+	ptr->val = 4;
+
+	print(ptr);
+	return 0;
+}
+
+```
 
 ### File systems
 
@@ -2777,6 +2947,53 @@ But the expectation is that the `main` function messages will appear before the 
 In general, when threads are created by the operating system, the execution totally depends on the scheduler.
 
 ### Mutexes
+
+```cpp
+#include <iostream>
+#include <thread>
+#include <mutex>
+
+std::mutex lock;
+static int count;
+
+void thread_1()
+{
+	while (1) {
+		std::cout << "in thread_1: waiting for lock" << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		lock.lock();
+		std::cout << "in thread_1: acquired" << std::endl;
+		count ++;
+		std::cout << "in thread_1: val " << count << std::endl;
+		std::cout << "in thread_1: released" << std::endl;
+		lock.unlock();
+	}
+}
+
+void thread_2()
+{
+	while (1) {
+		std::cout << "in thread_2: waiting for lock" << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		lock.lock();
+		std::cout << "in thread_2: acquired" << std::endl;
+		count ++;
+		std::cout << "in thread_2: val " << count << std::endl;
+		std::cout << "in thread_2: released" << std::endl;
+		lock.unlock();
+	}
+}
+
+int main()
+{
+	std::thread t1(thread_1);
+	std::thread t2(thread_2);
+
+	t1.join();
+	t2.join();
+}
+
+```
 
 ### Conditional Variables
 
@@ -2923,6 +3140,10 @@ int main()
 }
 
 ```
+
+#### Thread Pool
+
+#### Event Driven System
 
 ## Design Patterns
 
@@ -3171,6 +3392,20 @@ target_link_libraries(file_ops file)
 
 **4. Adding CFLAGS and CPPFLAGS**
 
+```cmake
+set(CMAKE_C_FLAGS "-Wall -Werror")
+set(CMAKE_CXX_FLAGS "-Wall -Werror")
+```
+
+The flag `CMAKE_C_FLAGS` and `CMAKE_CXX_FLAGS` takes all the compiler option that can be passed to `gcc/g++` or `clang`.
+
+**5. adding C++ standard**
+
+```cmake
+set(CMAKE_CXX_STANADARD "11")
+```
+
+The macro `CMAKE_CXX_STANDARD` sets the C++ standard when compiling.
 
 # Data Structures
 
@@ -3700,6 +3935,8 @@ Circular lists is similar to the linked list and the difference is that the last
        |--------------------------------<<----|
 
 ```
+
+## Circular Doubly Linked Lists
 
 ## Stack
 
@@ -4245,6 +4482,10 @@ int main()
 ## Ring Buffer
 
 ## Tree
+
+## Merkel Trees
+
+## Hash Tables
 
 # Search and Sorting
 
