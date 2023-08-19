@@ -1,5 +1,12 @@
 # Programming in C and C++
 
+This is a work in progress book.
+
+The users are allowed to read the book as many times as they want. Copying and redistribution without permission are prohibitted.
+
+Copyright: Devendra Naga All rights reserved.
+
+
 ## Introduction
 
 This book tries to explain programming in C and C++. C and C++ although are the oldest programming languages they are still in use by most of the operating systems such as Linux, RTOSes such as FreeRTOS.
