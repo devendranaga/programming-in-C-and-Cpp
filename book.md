@@ -2288,6 +2288,18 @@ the prototype of `fopen` is
 FILE *fopen(const char *filename, const char *mode);
 ```
 
+The `fopen` function have the following modes.
+
+| S.No | Name | Description |
+|------|------|-------------|
+| 1 | `r` | read |
+| 2 | `w` | write |
+| 3 | `a` | append |
+| 4 | `rb` | read binary |
+| 5 | `wb` | write binary |
+| 6 | `ab` | append binary |
+
+
 the prototype of `fclose` is
 
 ```c
@@ -2372,6 +2384,16 @@ msg[strlen(msg) - 1] = '\0';
 
 **3. Writing to a file**
 
+Writing to a file can be done with the `fputs`, `fputc` or `fprintf` functions.
+
+The prototype of `fputs` is as follows.
+
+```c
+int fputs(char *str, FILE *fp);
+```
+
+Below is one example:
+
 ```c
 #include <stdio.h>
 
@@ -2395,9 +2417,130 @@ int main()
 
 **4. Copying a file**
 
+Copying a file to another file in C involve reading the input file and writing the content to a new file.
+
+Below is one example of copying a file:
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    const char *file_in = "c/filecopy.c";
+    const char *file_out = "c/filecopy.c.copy";
+    FILE *f_in;
+    FILE *f_wr;
+    char str[1024];
+
+    f_in = fopen(file_in, "r");
+    if (!f_in) {
+        return -1;
+    }
+
+    f_wr = fopen(file_out, "w");
+    if (!f_wr) {
+        fclose(f_in);
+        return -1;
+    }
+
+    while (fgets(str, sizeof(str), f_in)) {
+        fputs(str, f_wr);
+    }
+
+    fclose(f_in);
+    fclose(f_wr);
+
+    return 0;
+}
+
+```
+
 **5. Number of characters in a file**
 
+The function `fgetc` reads one character from a file. If an end of file is reached, it returns an EOF marker which the caller
+can then check and stop reading further.
+
+```c
+int fgetc(FILE *fp);
+```
+
+In general `fgetc` does not have much usecases for high performat applications. Its use is in writing tools.
+
+Using `fgetc` we can count the number of characters in a file.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    const char *filename = "c/numchar.c";
+    FILE *fp;
+    char a;
+    int num_chars = 0;
+
+    fp = fopen(filename, "r");
+    if (!fp) {
+        return -1;
+    }
+
+    while (1) {
+        a = fgetc(fp);
+        if (a == EOF) {
+            break;
+        }
+        num_chars ++;
+    }
+
+    printf("number of characters %d\n", num_chars);
+
+    return 0;
+}
+
+```
+
 **6. Finding the file size**
+
+The functions `fseek` and `ftell` can be used to seek to a certain position and finding the file offset respectively.
+
+The prototype of `fseek` is as follows:
+
+```c
+int fseek(FILE *fp, long offset, int whence);
+```
+
+The whence parameter is one of `SEEK_SET`, `SEEK_CUR` or `SEEK_END`.
+
+The prototype of `ftell` is as follows:
+
+```c
+long ftell(FILE *fp);
+```
+
+The below example uses both the functions.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    const char *filename = "c/filesize.c";
+    long int filesize;
+    FILE *fp;
+
+    fp = fopen(filename, "r");
+    if (!fp) {
+        return -1;
+    }
+
+    fseek(fp, 0, SEEK_END);
+    filesize = ftell(fp);
+
+    printf("file size %ld\n", filesize);
+
+    return 0;
+}
+
+```
 
 #### Operating with the binary files
 
