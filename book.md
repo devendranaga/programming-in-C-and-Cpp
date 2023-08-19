@@ -2264,6 +2264,79 @@ The `string.h` contains the prototypes for string related functions such as `str
 
 ### Command line arguments (argc, argv)
 
+
+The function `main` accepts two more arguments `argc` and `argv`. The signature looks as follows.
+
+
+```c
+int main(int argc, char **argv);
+```
+
+The first argument is the number of arguments and the second argument contain the actual number of arguments.
+
+Below is one example,
+
+```c
+#include <stdio.h>
+
+int main(int argc, char **argv)
+{
+    int i;
+
+    for (i = 0; i < argc; i ++) {
+        printf("arg[%d]: %s\n", i, argv[i]);
+    }
+
+    return 0;
+}
+
+```
+
+#### getopt
+
+**1. Taking command line arguments via getopt**
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <getopt.h>
+
+int main(int argc, char **argv)
+{
+    int a = 0;
+    char *str = NULL;
+    bool t = false;
+    int ret;
+
+    while ((ret = getopt(argc, argv, "i:s:t")) != -1) {
+        switch (ret) {
+            case 'i':
+                a = atoi(optarg);
+            break;
+            case 's':
+                str = optarg;
+            break;
+            case 't':
+                t = true;
+            break;
+            default:
+                printf("%s <-i int value> <-s string value> -t\n", argv[0]);
+                return -1;
+        }
+    }
+
+    printf("a %d\n", a);
+    if (str) {
+        printf("str %s\n", str);
+    }
+    printf("t %d\n", t);
+
+    return 0;
+}
+
+```
+
 ### File I/O
 
 File I/O operations are exposed to the user by the libc. The libc indirectly calls the underlying system calls of the Operating system to manipulate the file. The File I/O APIs are declared in the `stdio.h`.
@@ -2551,6 +2624,33 @@ int main()
 
 **1. Using fscanf, fgets and fprintf**
 
+The functions `fscanf`, `fgets` and `fprintf` allow to perform more than file operations but also input and output operations on console as well.
+
+There are 3 pointer definitions to access the input and output.
+
+| S.No | Name | Description |
+|------|------|-------------|
+| 1 | `stdin` | standard input |
+| 2 | `stdout` | standard output |
+| 3 | `stderr` | standard error |
+
+The prototype of `fscanf` looks as follows.
+
+```c
+int fscanf(FILE *fp, const char *fmt, ...);
+```
+
+The prototype of `fgets` looks as follows.
+
+```c
+char *fgets(char *str, int size, FILE *fp);
+```
+
+The prototype of `fprintf` looks as follows.
+
+```c
+int fprintf(FILE *fp, const char *fmt, ...);
+```
 
 # C++ programming
 
