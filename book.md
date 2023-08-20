@@ -2641,11 +2641,83 @@ There are 3 pointer definitions to access the input and output.
 | 2 | `stdout` | standard output |
 | 3 | `stderr` | standard error |
 
+**fscanf**
+
 The prototype of `fscanf` looks as follows.
 
 ```c
 int fscanf(FILE *fp, const char *fmt, ...);
 ```
+
+The `fscanf` function can be used to read the input data entered on console. The `stdin` can be used as the first argument.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int a;
+    char str[100];
+    int ret;
+
+    ret = fscanf(stdin, "%d %s", &a, str);
+    if (ret != 2) {
+        printf("incorrect number of arguments\n");
+        return -1;
+    }
+
+    printf("a=%d str=%s\n", a, str);
+
+    return 0;
+}
+
+```
+
+The `fscanf` can be specifically used to read a pattern set from a file. For example consider a database with name and age group of friends such as the following.
+
+```
+dev 33
+rahul 34
+nithin 38
+seema 35
+
+```
+
+Below program reads the input file using `fscanf` and prints the contents on the screen.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    const char *filename = "./c/file_pattern";
+    FILE *fp;
+    int ret;
+
+    fp = fopen(filename, "r");
+    if (!fp) {
+        return -1;
+    }
+
+    while (1) {
+        char name[30];
+        int age;
+
+        ret = fscanf(fp, "%s %d", name, &age);
+        if (ret != 2) {
+            break;
+        }
+        printf("name: %s age: %d\n", name, age);
+    }
+
+    fclose(fp);
+
+    return 0;
+}
+
+```
+
+**fgets**
 
 The prototype of `fgets` looks as follows.
 
@@ -2653,16 +2725,193 @@ The prototype of `fgets` looks as follows.
 char *fgets(char *str, int size, FILE *fp);
 ```
 
+The function `fgets` returns the entire line that is read from the `fp`.
+
+- If the `fp` is `stdin` it will return an entire line that is read.
+- If the `fp` is a file it will return an entire line that is read.
+
+Below program shows an example usage of `fgets` on `stdin`.
+
+To exit the program press `ctrl + D`. The `ctrl + D` is an end of file marker. Soon as the function `fgets` encounters it, it returns `NULL`.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    char str[100];
+    char *err;
+
+    while (1) {
+        err = fgets(str, sizeof(str), stdin);
+        if (err == NULL) {
+            printf("stopping program\n");
+            break;
+        }
+
+        printf("you entered - %s", str);
+    }
+
+    return 0;
+}
+
+```
+
+Below program shows an example of `fgets` reading from the file.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    char *filename = "c/fgets2.c";
+    FILE *fp;
+    char str[100];
+
+    fp = fopen(filename, "r");
+    if (!fp) {
+        return -1;
+    }
+
+    while (fgets(str, sizeof(str), fp) != NULL) {
+        fprintf(stderr, "%s", str);
+    }
+
+    fclose(fp);
+
+    return 0;
+}
+
+```
+
+Lets look at the below program:
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    char *filename = "c/fgets_newline.c";
+    FILE *fp;
+    char str[100];
+
+    fp = fopen(filename, "r");
+    if (!fp) {
+        return -1;
+    }
+
+    while (fgets(str, sizeof(str), fp) != NULL) {
+        fprintf(stderr, "line '%s'\n", str);
+    }
+    fclose(fp);
+
+    return 0;
+}
+
+```
+
+It prints 
+
+```
+line '#include <stdio.h>
+'
+line '
+'
+line 'int main()
+'
+line '{
+'
+line '    char *filename = "c/fgets_newline.c";
+'
+line '    FILE *fp;
+'
+line '    char str[100];
+'
+line '
+'
+
+```
+
+The extra newline at each line is the `fgets` adding a newline soon as it encounters a new line.
+
+One way to solve it is to strip off the newline at the end of the string by doing the following:
+
+```c
+str[strlen(str) - 1] = '\0';
+```
+
+The above statement strips off the newline character from the buffer returned by `fgets`.
+
+**fprintf**
+
 The prototype of `fprintf` looks as follows.
 
 ```c
 int fprintf(FILE *fp, const char *fmt, ...);
 ```
 
+Just like `fscanf` the `fprintf` prints on the console or to a file. The `stdout` pointer can be used to print the values on the console.
+
+Below example prints the values on the console using `fprintf`.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    char *str = "dev";
+    int a = 33;
+
+    fprintf(stdout, "str=%s a=%d\n", str, a);
+
+    return 0;
+}
+
+```
+
+The `fprintf` function can take a file descriptor so it can also be a file that is opened in write mode.
+
+Below example prints the age and name of friends in the file using `fprintf`.
+
+```c
+#include <stdio.h>
+
+struct S {
+    char *name;
+    int age;
+} friends[] = {
+    {"Dev", 33},
+    {"Rahul", 34},
+    {"Nithin", 38},
+    {"Seema", 35},
+};
+
+int main()
+{
+    const char *filename = "c/file_write";
+    FILE *fp;
+    int i;
+
+    fp = fopen(filename, "w");
+    if (!fp) {
+        return -1;
+    }
+
+    for (i = 0; i < sizeof(friends) / sizeof(friends[0]); i ++) {
+        fprintf(fp, "%s %d\n", friends[i].name, friends[i].age);
+    }
+
+    fclose(fp);
+
+    return 0;
+}
+
+```
+
 #### Useful macros
 
 **1. Minimum of two numbers**
-
+i
 ```c
 #define MIN(_a, _b) (((_a) < (_b)) ? (_a) : (_b))
 ```
@@ -2729,6 +2978,44 @@ But the use of `cout` and `cin` are very different.
 Include header file `iostream` when using them.
 
 For example, 
+
+```cpp
+#include <iostream>
+
+int main()
+{
+    std::cout << "hello world" << std::endl;
+    return 0;
+}
+
+```
+
+Compile this with `g++` as `g++ hello_world.cc`. As usual the binary `a.out` is created after successful compilation.
+
+The above program prints "hello world" on screen when executed.
+
+The `std::endl` is like the newline `\n` character. We can as well add `\n` in the above string in the program.
+
+Below is one example of the use of `cin`.
+
+```cpp
+#include <iostream>
+
+int main()
+{
+	std::string str;
+	int a;
+
+	std::cin >> a >> str;
+	std::cout << "a: " << a << " " << "str: " << str << std::endl;
+
+	return 0;
+}
+
+```
+
+Unlike the `fscanf` or `scanf` one does not have to give format specifier for the `cin`.
+
 ## New operators in C++
 
 **1. The Reference (`&`) operator.**
