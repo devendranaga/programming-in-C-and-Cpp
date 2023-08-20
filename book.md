@@ -2659,6 +2659,49 @@ The prototype of `fprintf` looks as follows.
 int fprintf(FILE *fp, const char *fmt, ...);
 ```
 
+#### Useful macros
+
+**1. Minimum of two numbers**
+
+```c
+#define MIN(_a, _b) (((_a) < (_b)) ? (_a) : (_b))
+```
+
+**2. Maximum of two numbers**
+
+```c
+#define MAX(_a, _b) (((_a) > (_b)) ? (_a) : (_b))
+```
+
+**3. Check if bit is set**
+
+```c
+#define check_bit(_val, _pos) (((_val) >> (_pos)) & 1u)
+```
+
+#### Useful helper functions
+
+**1. stoi**
+
+Description:
+
+String to integer conversion with using `strtol`.
+
+```c
+int stoi(const char *str, int *val)
+{
+    char *err = NULL;
+
+    *val = strtol(str, &err, 10);
+    if (err && (err[0] != '\0')) {
+        return -1;
+    }
+
+    return 0;
+}
+
+```
+
 # C++ programming
 
 ## Introduction
