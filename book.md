@@ -942,6 +942,20 @@ memset(a, 0, sizeof(a));
 
 Sets all the elements of the array `a` to 0.
 
+Another way to set array elements is as follows:
+
+```c
+int a[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+int i;
+
+for (i = 0; i < sizeof(a) / sizeof(a[0]); i ++) {
+    printf("a[%d] = %d\n", i, a[i]);
+}
+
+```
+
+But this means that all array elements must be initialized which is impractical for a large set of arrays.
+
 **2. Two Dimensional Arrays**
 
 Two dimensional arrays are represented as follows.
@@ -1906,6 +1920,31 @@ int main()
 
 ```
 
+Below is another example of accessing array elements with a pointer. The elements of array are updated with the pointer.
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int a[10];
+    int i;
+    int *p;
+
+    for (i = 0; i < sizeof(a) / sizeof(a[0]); i ++) {
+        p = &a[i];
+        *p = i;
+    }
+
+    for (i = 0; i < sizeof(a) / sizeof(a[0]); i ++) {
+        printf("%d\n", a[i]);
+    }
+
+    return 0;
+}
+
+```
+
 
 ## Dynamic Memory Allocation
 
@@ -2153,6 +2192,46 @@ struct shelf {
     int n_papers;
 }
 ```
+
+**Function pointers in structures**
+
+The below structure declares two function pointers `get` and `set` which are accessible from the structure variable.
+
+```c
+struct S {
+    int (*get)();
+    void (*set)(int);
+};
+
+struct S s;
+
+s.set(3); // set the variable
+int var = s.get(); // get the variable
+
+```
+
+But in general the pointers `s.get` and `s.set` contain garbage pointers. So accessing them generally results in a segmentation fault or in bad situation results in abnormal program execution.
+
+One way to assign the addresses is the following:
+
+```c
+int a;
+int my_get() { return a; }
+void my_set(int A) { a = A; }
+
+struct S s;
+
+memset(&s, 0, sizeof(struct S));
+
+s.get = my_get;
+s.set = my_set;
+
+```
+
+Now accessing the function pointers `s.get` and `s.set` will indirectly call `my_get` and `my_set` functions.
+
+Structure pointers have a wide range of usecases. One of such use cases is writing abstractions.
+
 
 ### Bit fields
 
@@ -3024,6 +3103,33 @@ Unlike the `fscanf` or `scanf` one does not have to give format specifier for th
 
 **3. delete**
 
+**4. Range based for**
+
+The range based for loop is a new feature introduced in C++11.
+
+Below is one use of the range based for.
+
+```cpp
+#include <iostream>
+
+int main()
+{
+	int a[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+	for (auto i : a) {
+		printf("%d\n", i);
+	}
+
+	return 0;
+}
+
+```
+
+The range based for loop have the following advantages:
+
+- No missed condition checks thus removing the probability of infinite loops.
+- Auto increment and initialization.
+
 ## New keywords in C++
 
 #### constexpr
@@ -3052,8 +3158,6 @@ We use auto at times when writing a complex type becomes very hard. We will see 
 Remember that not all `auto` type deductions are as we expect.
 
 
-### Allocating and Freeing
-
 ## Classes
 
 Classes in C++ are similar to the structures in C. The Class is enclosure for data and operations on the data.
@@ -3076,6 +3180,57 @@ class <name> {
 };
 ```
 
+The below example provides a simple class definition.
+
+```cpp
+
+class S {
+    public:
+        S() { a = 0; }
+        ~S() { }
+        void set(int a) { a_ = a; }
+        void get() { return a_; }
+
+    private:
+        int a_;
+};
+
+```
+
+The functions `S()` and `~S()` are constructor and destructor respectively. The constructor gets called when the class object is instantiated. The destructor is called when the class object goes out of scope. Lifecycle of the class object is similar to that of the C variable.
+
+The functions `set` and `get` within `S` are called public member functions.
+The variable `a_` is a private member variable.
+
+Public members can be accessed by the users of the class while private members are not accessible.
+
+The below declares the class object of `S`.
+
+```cpp
+S s;
+```
+
+The member functions `set` and `get` are accessible as,
+
+```cpp
+S s;
+
+s.set(3);
+int val = s.get();
+
+```
+
+Accessing `a_` directly as below results in a compiler error that the variable is part of the `private` section of the class.
+
+```cpp
+S s;
+
+int val = s.a_; // results in compiler error
+
+```
+
+The variable `a_` can only be accessible via the `get` method.
+
 ### Constructors and Destructors
 
 **Copy constructor**
@@ -3083,6 +3238,67 @@ class <name> {
 **Move constructor**
 
 **this pointer**
+
+The `this` pointer is nothing but self referencing the class member function.
+
+The below program shows the use of `this` pointer:
+
+```cpp
+#include <iostream>
+
+class S {
+	public:
+		S() { a_ = 0; }
+		~S() { }
+
+		int get() { return this->a_; }
+		void set(int a) { this->a_ = a; }
+
+	private:
+		int a_;
+};
+
+int main()
+{
+	S s;
+
+	s.set(3);
+	std::cout << "val " << s.get() << std::endl;
+
+	return 0;
+}
+
+```
+
+The most important use case is that when the input variable to the member function and the class variables / functions are same, then to inhibit confusion and to assist compiler, `this` can be used.
+
+```cpp
+#include <iostream>
+
+struct S {
+	public:
+		S() { a = 0; }
+		~S() { }
+
+		int get() { return a; }
+		void set(int a) { this->a = a; }
+
+	private:
+		int a;
+};
+
+int main()
+{
+	S s;
+
+	s.set(3);
+	std::cout << "val " << s.get() << std::endl;
+
+	return 0;
+}
+
+```
+
 
 **Virtual functions**
 
