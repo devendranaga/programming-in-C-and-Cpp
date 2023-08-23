@@ -4,5 +4,5 @@ This manual describe in more traditional way of explaining what are programming 
 
 This manual tries to cover a lot of topics with programming examples at each place for practicality.
 
-Open [book.md](https://github.com/devendranaga/programming-in-C-and-Cpp/blob/main/book.md) for the manual.
+Open [book.pdf](https://github.com/devendranaga/programming-in-C-and-Cpp/blob/main/book.pdf) for the manual.
 
