@@ -28,6 +28,10 @@ class shared_ptr {
 			count_ ++;
 		}
 
+		T *get() const noexcept { return memory_; }
+
+		bool unique() const { return count_ == 1; }
+
 		T *operator->() const { return memory_; }
 		T &operator*() const { return *memory_; }
 
@@ -45,6 +49,7 @@ struct S {
 void K(shared_ptr<S> s)
 {
 	std::cout << "ref_counter for s: " << s.get_ref_count() << std::endl;
+	std::cout << "unique s: " << s.unique() << std::endl;
 	s->s = 6;
 }
 
@@ -59,12 +64,16 @@ int main()
 	std::cout << "ref_counter for s: " << s.get_ref_count() << std::endl;
 	std::cout << "ref_counter for s1: " << s1.get_ref_count() << std::endl;
 
+	std::cout << "unique s: " << s.unique() << " unique s1: " << s1.unique() << std::endl;
+
 	K(s);
 
 	std::cout << "ref_counter for s: " << s.get_ref_count() << std::endl;
 	std::cout << "ref_counter for s1: " << s1.get_ref_count() << std::endl;
 
 	std::cout  << "s: " << s->s << " " << "s1: " << *s1 << std::endl;
+
+	std::cout << "s1: " << s1.get() << std::endl;
 
 	return 0;
 }
