@@ -9,6 +9,12 @@ int main()
                 a & b, a | b, a ^ b);
 
     printf("%d %d\n", a && b, a || b);
+
+    int r = -1;
+    int p = 1;
+
+    printf("%d %d\n", !!r, !!p);
+
     return 0;
 }
 
